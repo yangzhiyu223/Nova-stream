@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Stream · 创作者主页</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/extra.css">
+<style>
+  .cover{
+    height:210px;border-radius:0 0 28px 28px;position:relative;overflow:hidden;
+    background:linear-gradient(120deg,#ffd3a8,#f97316 42%,#14b8a6 78%,#0b5e58);
+  }
+  .cover::after{
+    content:"";position:absolute;inset:0;
+    background:radial-gradient(600px 300px at 20% 100%,rgba(255,255,255,.42),transparent 60%),
+               radial-gradient(500px 260px at 85% 0%,rgba(255,255,255,.3),transparent 62%);
+  }
+  .prof{max-width:1060px;margin:0 auto;padding:0 26px 70px}
+  .prof-head{display:flex;align-items:flex-end;gap:22px;margin-top:-56px;position:relative;z-index:2}
+  .prof-head .ava{width:124px;height:124px;border-radius:50%;border:5px solid #fff;box-shadow:var(--sh-md)}
+  .prof-head .txt{padding-bottom:6px}
+  .prof-head h1{margin:0 0 6px;font-size:26px}
+  .prof-head p{margin:0;font-size:13.5px;color:var(--ink-3)}
+  .stats{display:flex;gap:34px;margin:24px 0 6px;flex-wrap:wrap}
+  .stat b{display:block;font-size:19px}
+  .stat span{font-size:12.5px;color:var(--ink-3)}
+  .tabs{display:flex;gap:26px;border-bottom:1px solid var(--line);margin:26px 0 24px;font-size:14px}
+  .tabs a{padding:12px 2px;color:var(--ink-2);position:relative}
+  .tabs a:hover{color:var(--ink)}
+  .tabs a.on{color:var(--ink);font-weight:700}
+  .tabs a.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:3px;background:var(--orange)}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html"><span class="mark">N</span>Nova Stream</a>
+  <form class="search" onsubmit="event.preventDefault();location.href='search.html'">
+    <span>🔍</span><input type="text" placeholder="搜索视频、创作者、分类">
+  </form>
+  <nav class="topnav">
+    <a href="index.html">首页</a>
+    <a href="categories.html">分类</a>
+    <a href="creators.html">创作者</a>
+    <a href="friends.html" id="navFriends">好友</a>
+    <a href="upload.html">创作中心</a>
+    <a href="profile.html">我的</a>
+  </nav>
+  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+</header>
+
+<div class="crumb-bar" style="max-width:1060px;margin:20px auto -4px;padding:0 26px;display:flex;align-items:center;gap:12px">
+  <a class="btn btn-ghost" href="creators.html" id="backBtn" style="height:38px;padding:0 16px;font-size:13px;border-radius:999px;display:inline-flex;align-items:center">← 返回上级</a>
+  <span style="font-size:12.5px;color:var(--ink-3)" id="crumb">创作者 / <b id="crumbName" style="font-weight:600;color:var(--ink-2)">Maya Chen</b></span>
+</div>
+
+<div class="cover"></div>
+
+<div class="prof">
+  <div class="prof-head">
+    <div class="ava ph-1" style="border-radius:50%" id="uAva"></div>
+    <div class="txt">
+      <h1 id="uName">Maya Chen</h1>
+      <p id="uDesc">生活 · 旅行 · 创意</p>
+    </div>
+    <div style="margin-left:auto;padding-bottom:10px;display:flex;gap:12px">
+      <button class="btn btn-primary" id="f" >关注</button>
+      <button class="btn btn-ghost" id="msgBtn">主页消息</button>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b id="uFans">1.2M</b><span>粉丝</span></div>
+    <div class="stat"><b id="uVids">480</b><span>视频</span></div>
+    <div class="stat"><b>320M</b><span>总播放</span></div>
+  </div>
+
+  <div class="tabs" id="tabs">
+    <a href="#" class="on" data-tab="works">作品</a>
+    <a href="#" data-tab="series">合集</a>
+    <a href="#" data-tab="feed">动态</a>
+    <a href="#" data-tab="about">简介</a>
+  </div>
+
+  <div class="grid" id="grid"></div>
+  <div id="pane"></div>
+</div>
+
+<script src="js/data.js"></script>
+<script>
+  // 按 ?u=创作者名 显示对应的人
+  const _sp = new URLSearchParams(location.search);
+  const q = _sp.get("u") || "Maya Chen";
+
+  // 「主页消息」跳到好友版块的私信，并且直接选中这位创作者
+  (function msg(){
+    const b = document.getElementById("msgBtn");
+    if (!b) return;
+    b.addEventListener("click", () => {
+      location.href = "friends.html?chat=" + encodeURIComponent(q);
+    });
+  })();
+
+  // 返回按钮跟着来源走：从好友、搜索、动态点进来就回那一页
+  (function backTo(){
+    const btn = document.getElementById("backBtn");
+    const crumb = document.getElementById("crumb");
+    const from = _sp.get("from");
+    const map = {
+      friends: { href:"friends.html", label:"← 返回好友", crumb:"好友 / " },
+      search:  { href:"search.html?q=" + encodeURIComponent(q), label:"← 返回搜索", crumb:"搜索结果 / " },
+      feed:    { href:"feed.html", label:"← 返回动态", crumb:"动态 / " },
+      index:   { href:"index.html", label:"← 返回首页", crumb:"首页 / " }
+    };
+    const c = map[from];
+    if (c){
+      btn.textContent = c.label;
+      btn.setAttribute("href", c.href);
+      crumb.firstChild.nodeValue = c.crumb;
+      // 从好友过来，顶部导航也把「好友」点亮，别看着像丢了
+      if (from === "friends") document.getElementById("navFriends").classList.add("active");
+      return;
+    }
+    if (from === "watch"){ btn.textContent = "← 返回视频"; btn.onclick = e => { e.preventDefault(); history.length > 1 ? history.back() : location.href = "index.html"; }; return; }
+    // 没带来源就用浏览器的上一页，没有上一页再回创作者列表
+    btn.textContent = "← 返回上级";
+    btn.onclick = e => {
+      e.preventDefault();
+      if (document.referrer && history.length > 1) history.back();
+      else location.href = "creators.html";
+    };
+  })();
+  const me = CREATORS.find(c => c.n === q) || CREATORS[0];
+  const mine = VIDEOS.filter(v => v.c === me.n);
+
+  document.title = "Nova Stream · " + me.n;
+  document.getElementById("uName").textContent = me.n;
+  document.getElementById("crumbName").textContent = me.n;
+  document.getElementById("uDesc").textContent = me.d;
+  document.getElementById("uFans").textContent = me.f;
+  document.getElementById("uVids").textContent = (mine.length * 60 + 40);
+  document.getElementById("uAva").className = "ava ph-" + me.ph;
+  document.querySelector(".prof-head .ava").style.borderRadius = "50%";
+  const f = document.getElementById("f");
+  function paintFollow(){
+    const on = isSub(me.n);
+    f.dataset.on = on ? "1" : "0";
+    f.textContent = on ? "已关注" : "关注";
+    f.classList.toggle("btn-ghost", on);
+    f.classList.toggle("btn-primary", !on);
+    f.style.background = on ? "linear-gradient(100deg,#0aa395,#2ec9ba)" : "";
+  }
+  paintFollow();
+
+  const list = mine.length ? [...mine, ...VIDEOS.filter(v => v.c !== me.n).slice(0,4)] : VIDEOS;
+  const grid = document.getElementById("grid");
+  const pane = document.getElementById("pane");
+
+  const SERIES = [
+    { n: "日常记录", c: 12, t: "每天一段，攒着看", ph: me.ph },
+    { n: "创作幕后", c: 8, t: "拍摄和剪辑的那些事", ph: (me.ph % 8) + 1 },
+    { n: "随手拍", c: 26, t: "没剪完的也放出来", ph: ((me.ph + 3) % 8) + 1 }
+  ];
+  const FEED = [
+    { d: "今天第 3 次改封面，终于敢发了", t: "2 小时前", like: 128 },
+    { d: "有人问我用的什么机器，回在评论区了", t: "昨天", like: 64 },
+    { d: "下周停更一天，出去走走", t: "3 天前", like: 210 }
+  ];
+
+  function showTab(name){
+    document.querySelectorAll("#tabs a").forEach(a =>
+      a.classList.toggle("on", a.dataset.tab === name));
+    grid.style.display = name === "works" ? "" : "none";
+    pane.style.display = name === "works" ? "none" : "";
+    if (name === "works"){
+      grid.innerHTML = list.map(videoCard).join("");
+    } else if (name === "series"){
+      pane.innerHTML = `<div class="series-grid">${SERIES.map(x => `
+        <a class="series" href="watch.html">
+          <div class="scover ph-${x.ph}"></div>
+          <h4>${x.n}</h4>
+          <p>${x.c} 个视频 · ${x.t}</p>
+        </a>`).join("")}</div>`;
+    } else if (name === "feed"){
+      pane.innerHTML = `<div class="feed-list">${FEED.map(x => `
+        <div class="feed-item">
+          <div class="fa ph-${me.ph}"></div>
+          <div class="fb">
+            <div class="fn">${me.n}</div>
+            <div class="fd">${x.d}</div>
+            <div class="ff"><span>${x.t}</span><span>♥ ${x.like}</span></div>
+          </div>
+        </div>`).join("")}</div>`;
+    } else {
+      pane.innerHTML = `<div class="about-box">
+        <h3>关于 ${me.n}</h3>
+        <p>${me.d} 方向的创作者，喜欢把手边的小事拍下来。更新不太规律，但每次都想认真一点。</p>
+        <ul>
+          <li><span>粉丝</span><b>${me.f}</b></li>
+          <li><span>视频</span><b>${mine.length * 60 + 40}</b></li>
+          <li><span>入驻</span><b>2023 年</b></li>
+          <li><span>所在地</span><b>上海</b></li>
+        </ul>
+      </div>`;
+    }
+    history.replaceState(null, "", "creator.html?u=" + encodeURIComponent(me.n) + "#" + name);
+  }
+
+  document.getElementById("tabs").addEventListener("click", e => {
+    const a = e.target.closest("a");
+    if (!a) return;
+    e.preventDefault();
+    showTab(a.dataset.tab);
+  });
+
+  showTab((location.hash || "#works").slice(1));
+  f.addEventListener("click", () => { toggleSub(me.n); paintFollow(); });
+</script>
+<script src="js/notify.js"></script>
+</body>
+</html>

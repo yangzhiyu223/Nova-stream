@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Stream · 账号设置</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/extra.css">
+<style>
+  .set-wrap{max-width:960px;margin:22px auto 70px;padding:0 24px;
+    display:grid;grid-template-columns:240px 1fr;gap:24px}
+  .set-menu{background:#fff;border-radius:28px;padding:24px 16px;box-shadow:var(--sh-md);height:max-content}
+  .set-menu a{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:14px;
+    font-size:14px;color:var(--ink-2);transition:.2s;position:relative}
+  .set-menu a:hover{background:#f6f8fa;color:var(--ink)}
+  .set-menu a.on{color:var(--ink);font-weight:700;background:#f6f8fa}
+  .set-menu a.on::before{content:"";position:absolute;left:0;top:13px;bottom:13px;width:3px;
+    border-radius:3px;background:var(--orange)}
+  .set-panel{background:#fff;border-radius:28px;padding:34px 36px;box-shadow:var(--sh-md)}
+  .set-panel h1{margin:0 0 8px;font-size:23px}
+  .set-panel .sub{margin:0 0 28px;font-size:13.5px;color:var(--ink-3)}
+  .f-row{margin-bottom:18px}
+  .f-row label{display:block;font-size:13px;color:var(--ink-2);margin-bottom:8px;font-weight:600}
+  .f-row input,.f-row select{
+    width:100%;height:52px;padding:0 18px;border-radius:999px;
+    border:1px solid #e8ebf0;background:#fff;font-size:14px;transition:.2s;
+  }
+  .f-row input:focus,.f-row select:focus{border-color:var(--orange);box-shadow:0 0 0 4px rgba(249,115,22,.1)}
+  .f-row input:disabled{background:#f7f9fb;color:var(--ink-3)}
+  .save{width:100%;height:52px;margin-top:10px;font-size:15px}
+  .switch-row{display:flex;align-items:center;justify-content:space-between;
+    padding:18px 0;border-bottom:1px solid #f4f6f9}
+  .switch-row:last-of-type{border:none}
+  .switch-row .k{font-size:14px;font-weight:600}
+  .switch-row .k small{display:block;font-weight:400;color:var(--ink-3);font-size:12.5px;margin-top:5px}
+  .tg{width:50px;height:29px;border-radius:99px;background:#e6eaf0;position:relative;transition:.24s;flex:0 0 auto}
+  .tg::after{content:"";position:absolute;left:3px;top:3px;width:23px;height:23px;border-radius:50%;
+    background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.16);transition:.24s}
+  .tg.on{background:linear-gradient(100deg,#14b8a6,#2ec9ba)}
+  .tg.on::after{left:24px}
+  .swatch{display:flex;gap:12px;margin-top:10px}
+  .swatch button{width:44px;height:44px;border-radius:50%;border:3px solid #fff;box-shadow:var(--sh-sm);transition:.2s}
+  .swatch button:hover{scale:1.08}
+  .swatch button.on{box-shadow:0 0 0 3px var(--orange)}
+  .back-row{max-width:960px;margin:26px auto -10px;padding:0 24px}
+  .back-row .btn{
+    height:40px;padding:0 18px;font-size:13px;gap:8px;
+    display:inline-flex;align-items:center;border-radius:999px;
+  }
+  .back-row .crumb{font-size:12.5px;color:var(--ink-3);margin-left:12px}
+  .back-row .crumb b{font-weight:600;color:var(--ink-2)}
+  .panel-back{
+    display:inline-flex;align-items:center;gap:7px;margin-bottom:20px;
+    font-size:12.5px;color:var(--ink-3);transition:.2s;
+  }
+  .panel-back:hover{color:var(--orange)}
+  .tabpane{display:none}
+  .tabpane.on{display:block}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html"><span class="mark">N</span>Nova Stream</a>
+  <form class="search" onsubmit="event.preventDefault();location.href='search.html'">
+    <span>🔍</span><input type="text" placeholder="搜索视频、创作者、分类">
+  </form>
+  <nav class="topnav">
+    <a href="index.html">首页</a>
+    <a href="categories.html">分类</a>
+    <a href="creators.html">创作者</a>
+    <a href="friends.html">好友</a>
+    <a href="upload.html">创作中心</a>
+    <a href="profile.html" class="active">我的</a>
+  </nav>
+  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+</header>
+
+<div class="back-row">
+  <a class="btn btn-ghost" href="profile.html">← 返回我的</a>
+  <span class="crumb">我的 / <b>账号设置</b></span>
+</div>
+
+<div class="set-wrap">
+  <aside class="set-menu" id="menu">
+    <a href="#" data-t="profile" class="on">🏠 个人资料</a>
+    <a href="#" data-t="account">📄 账号</a>
+    <a href="#" data-t="notify">🔔 通知</a>
+    <a href="#" data-t="privacy">🔒 隐私</a>
+    <a href="#" data-t="appear">🎨 外观</a>
+  </aside>
+
+  <section class="set-panel">
+    <!-- 个人资料 -->
+    <div class="tabpane on" id="p-profile">
+      <a class="panel-back" href="profile.html">← 返回上一级</a>
+      <h1>个人资料设置</h1>
+      <p class="sub">修改后会同步显示在你的主页上</p>
+      <div class="f-row">
+        <label>用户名</label>
+        <input type="text" value="子非余">
+      </div>
+      <div class="f-row">
+        <label>简介</label>
+        <input type="text" value="喜欢城市夜景和慢节奏的旅行记录。">
+      </div>
+      <div class="f-row">
+        <label>邮箱</label>
+        <input type="email" value="hello@novastream.demo">
+      </div>
+      <button class="btn btn-primary save" onclick="toast('修改已保存')">保存修改</button>
+    </div>
+
+    <!-- 账号 -->
+    <div class="tabpane" id="p-account">
+      <a class="panel-back" href="#" onclick="goPane('profile');return false">← 返回上一级</a>
+      <h1>账号</h1>
+      <p class="sub">账号安全相关的设置</p>
+      <div class="f-row"><label>账号 ID</label><input type="text" value="NS-2026-1119" disabled></div>
+      <div class="f-row"><label>当前密码</label><input type="password" placeholder="输入当前密码"></div>
+      <div class="f-row"><label>新密码</label><input type="password" placeholder="至少 8 位"></div>
+      <button class="btn btn-primary save" onclick="toast('密码已更新')">更新密码</button>
+    </div>
+
+    <!-- 通知 -->
+    <div class="tabpane" id="p-notify">
+      <a class="panel-back" href="#" onclick="goPane('profile');return false">← 返回上一级</a>
+      <h1>通知</h1>
+      <p class="sub">选择你希望接收的提醒</p>
+      <div class="switch-row">
+        <div class="k">新视频提醒<small>关注的创作者发布新内容时通知你</small></div>
+        <button class="tg on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="switch-row">
+        <div class="k">评论回复<small>有人回复你的评论时通知你</small></div>
+        <button class="tg on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="switch-row">
+        <div class="k">每周推荐<small>每周一封内容推荐邮件</small></div>
+        <button class="tg" onclick="this.classList.toggle('on')"></button>
+      </div>
+    </div>
+
+    <!-- 隐私 -->
+    <div class="tabpane" id="p-privacy">
+      <a class="panel-back" href="#" onclick="goPane('profile');return false">← 返回上一级</a>
+      <h1>隐私</h1>
+      <p class="sub">控制谁能看到你的内容</p>
+      <div class="switch-row">
+        <div class="k">公开我的关注列表<small>其他人可以看到你关注了谁</small></div>
+        <button class="tg on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="switch-row">
+        <div class="k">允许搜索到我<small>在搜索结果中显示你的主页</small></div>
+        <button class="tg on" onclick="this.classList.toggle('on')"></button>
+      </div>
+      <div class="switch-row">
+        <div class="k">隐藏观看记录<small>不向他人展示你最近看过的视频</small></div>
+        <button class="tg" onclick="this.classList.toggle('on')"></button>
+      </div>
+    </div>
+
+    <!-- 外观 -->
+    <div class="tabpane" id="p-appear">
+      <a class="panel-back" href="#" onclick="goPane('profile');return false">← 返回上一级</a>
+      <h1>外观</h1>
+      <p class="sub">选一个你喜欢的主色</p>
+      <div class="swatch">
+        <button class="on" style="background:linear-gradient(135deg,#f97316,#fb8c3c)" onclick="pick(this)"></button>
+        <button style="background:linear-gradient(135deg,#14b8a6,#2ec9ba)" onclick="pick(this)"></button>
+        <button style="background:linear-gradient(135deg,#5b6b85,#1c2330)" onclick="pick(this)"></button>
+        <button style="background:linear-gradient(135deg,#ffb27a,#f97316)" onclick="pick(this)"></button>
+      </div>
+      <div class="switch-row" style="margin-top:22px">
+        <div class="k">紧凑模式<small>缩小间距，一屏显示更多内容</small></div>
+        <button class="tg" onclick="this.classList.toggle('on')"></button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div id="toast" style="position:fixed;left:50%;bottom:40px;translate:-50% 0;padding:11px 20px;border-radius:999px;background:rgba(24,30,42,.88);color:#fff;font-size:13px;opacity:0;transition:.26s;pointer-events:none;z-index:99"></div>
+
+<script>
+  document.getElementById("menu").addEventListener("click", e=>{
+    const a = e.target.closest("a[data-t]"); if (!a) return;
+    e.preventDefault();
+    document.querySelectorAll("#menu a").forEach(x=>x.classList.remove("on"));
+    a.classList.add("on");
+    document.querySelectorAll(".tabpane").forEach(p=>p.classList.remove("on"));
+    document.getElementById("p-"+a.dataset.t).classList.add("on");
+  });
+
+  function goPane(t){
+    const a = document.querySelector(`#menu a[data-t="${t}"]`);
+    if (a) a.click();
+    window.scrollTo({ top:0, behavior:"smooth" });
+  }
+
+  function pick(b){
+    document.querySelectorAll(".swatch button").forEach(x=>x.classList.remove("on"));
+    b.classList.add("on");
+    toast("主色已切换");
+  }
+
+  let tt;
+  function toast(msg){
+    const el = document.getElementById("toast");
+    el.textContent = msg; el.style.opacity = 1;
+    clearTimeout(tt); tt = setTimeout(()=>el.style.opacity = 0, 1700);
+  }
+</script>
+<script src="js/notify.js"></script>
+</body>
+</html>

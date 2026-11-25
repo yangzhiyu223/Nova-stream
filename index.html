@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Stream · 首页</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/extra.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html"><span class="mark">N</span>Nova Stream</a>
+  <form class="search" onsubmit="event.preventDefault();location.href='search.html'">
+    <span>🔍</span>
+    <input type="text" placeholder="搜索视频、创作者、分类">
+  </form>
+  <nav class="topnav">
+    <a href="index.html" data-page="index.html">首页</a>
+    <a href="categories.html" data-page="categories.html">分类</a>
+    <a href="creators.html" data-page="creators.html">创作者</a>
+    <a href="friends.html" data-page="friends.html">好友</a>
+    <a href="upload.html">创作中心</a>
+    <a href="profile.html" data-page="profile.html">我的</a>
+  </nav>
+  <button class="icon-btn" title="消息">🔔</button>
+  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+</header>
+
+<div class="shell">
+  <aside class="side">
+    <p class="side-title">发现</p>
+    <nav>
+      <a href="index.html" class="active"><span class="dot"></span>推荐</a>
+      <a href="categories.html"><span class="dot"></span>热门</a>
+      <a href="creators.html"><span class="dot"></span>订阅</a>
+      <a href="search.html"><span class="dot"></span>搜索</a>
+    </nav>
+    <p class="side-title" style="margin-top:26px">我的</p>
+    <nav>
+      <a href="profile.html"><span class="dot"></span>个人主页</a>
+      <a href="settings.html"><span class="dot"></span>账号设置</a>
+      <a href="login.html"><span class="dot"></span>登录注册</a>
+    </nav>
+    <div class="side-foot">
+      今天也来点新鲜的<br>
+      已经为你准备了 24 条推荐
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="chips" id="chips"></div>
+    <div class="grid" id="grid"></div>
+  </main>
+</div>
+
+<script src="js/data.js"></script>
+<script>
+  const chips = document.getElementById("chips");
+
+  // 分类 -> 匹配规则（关键词 + 额外补充视频）
+  const CAT_KEY = {
+    "全部": [],
+    "知识": ["网站", "极简", "改造"],
+    "娱乐": ["生活记录", "vlog", "工作室"],
+    "科技": ["桌面", "网站", "tech", "极简"],
+    "生活": ["生活记录", "厨房", "拉面", "清晨"],
+    "音乐": ["白噪音", "森林", "music"],
+    "游戏": ["游戏", "实况"],
+    "旅行": ["旅行", "公路", "山海", "城市夜景"]
+  };
+
+  // 首页没有、但分类里要有的“专属填充”
+  const CAT_EXTRA = {
+    "影视": [
+      { t: "一部电影的一百个镜头", c: "Studio Vlogs", v: "18.6万", d: "14:22", ph: 2 },
+      { t: "影史里最会讲故事的人", c: "Cooking with Ben", v: "7.1万", d: "26:40", ph: 4 }
+    ],
+    "美食": [
+      { t: "深夜厨房 · 一人食拉面", c: "Cooking with Ben", v: "8.9万", d: "15:31", ph: 4 },
+      { t: "咖啡拉花入门十条", c: "Cooking with Ben", v: "1.9万", d: "09:12", ph: 7 }
+    ],
+    "运动": [
+      { t: "每天早上二十分钟", c: "Fit Life", v: "5.4万", d: "20:03", ph: 2 },
+      { t: "跑步半年我变了什么", c: "Fit Life", v: "11.2万", d: "13:48", ph: 5 }
+    ],
+    "设计": [
+      { t: "改一百次才敢发的封面", c: "Maya Chen", v: "6.8万", d: "12:15", ph: 1 },
+      { t: "颜色是怎么影响人的", c: "Studio Vlogs", v: "9.4万", d: "18:30", ph: 7 }
+    ],
+    "萌宠": [
+      { t: "猫在等我回家的一整天", c: "Maya Chen", v: "32.5万", d: "10:12", ph: 1 },
+      { t: "养猫三个月翻车记录", c: "Studio Vlogs", v: "15.7万", d: "08:46", ph: 2 }
+    ],
+    "播客": [
+      { t: "深夜电台 · 聊聊一个人住", c: "Music Vibes", v: "4.6万", d: "42:18", ph: 8 },
+      { t: "在雨天和自己对话", c: "Music Vibes", v: "9.1万", d: "36:02", ph: 6 }
+    ]
+  };
+
+  const ALL = [...VIDEOS, ...VIDEOS.slice(0, 4)];
+  let nowCat = "全部";
+  let nowCreator = "";
+
+  function render(){
+    let list = ALL;
+    if (nowCat !== "全部"){
+      const keys = (CAT_KEY[nowCat] || []).map(k => k.toLowerCase());
+      const extra = CAT_EXTRA[nowCat] || [];
+      const hit = ALL.filter(v =>
+        keys.some(k => v.t.toLowerCase().includes(k) || v.c.toLowerCase().includes(k)));
+      list = [...hit, ...extra];
+    }
+    if (nowCreator) list = list.filter(v => v.c === nowCreator);
+
+    const grid = document.getElementById("grid");
+    grid.innerHTML = list.length
+      ? list.map(videoCard).join("")
+      : `<div class="empty">
+           <div class="eico">🫧</div>
+           <h3>这个分类还没有视频</h3>
+           <p>换个分类看看，或者先去逛逛别的</p>
+           <button class="btn btn-primary" onclick="setCat('全部')">看全部推荐</button>
+         </div>`;
+  }
+
+  const CATS_ALL = ["全部","知识","娱乐","科技","生活","音乐","游戏","旅行","影视","美食","运动","设计","萌宠","播客"];
+
+  function setCat(name){
+    nowCat = name;
+    nowCreator = "";
+    document.querySelectorAll("#chips .chip").forEach(b =>
+      b.classList.toggle("active", b.dataset.cat === name));
+    history.replaceState(null, "", name === "全部" ? "index.html" : "index.html?cat=" + encodeURIComponent(name));
+    render();
+  }
+  window.setCat = setCat;
+
+  function buildChips(){
+    chips.innerHTML = CATS.map(c =>
+      `<button class="chip ${c === nowCat ? "active" : ""}" data-cat="${c}">${c}</button>`).join("");
+  }
+  chips.addEventListener("click", e => {
+    const btn = e.target.closest(".chip");
+    if (btn) setCat(btn.dataset.cat);
+  });
+
+  // 从分类页跳过来时带上 ?cat=
+  const q = new URLSearchParams(location.search);
+  const fromCat = q.get("cat");
+  const fromUser = q.get("creator");
+  if (fromCat && fromCat !== "全部" && !CATS.includes(fromCat)) CATS.push(fromCat);
+  if (fromCat) setCat(fromCat);
+  else if (fromUser){ nowCreator = fromUser; buildChips(); render(); }
+  else { buildChips(); render(); }
+</script>
+<script src="js/notify.js"></script>
+</body>
+</html>

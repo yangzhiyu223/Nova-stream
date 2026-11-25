@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Stream · 空状态</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .empty-wrap{max-width:1000px;margin:0 auto;padding:30px 26px 60px}
+  .panel{background:#fff;border-radius:28px;box-shadow:var(--sh-md);padding:60px 30px;text-align:center}
+  .illus{width:150px;height:150px;margin:0 auto 26px;position:relative}
+  .illus .box{
+    position:absolute;inset:0;border-radius:36px;
+    background:linear-gradient(140deg,#fff3e8,#e8faf7);
+    border:2px dashed #ffd0ad;display:grid;place-items:center;
+    animation:float 3.6s ease-in-out infinite;
+  }
+  .illus .box span{font-size:46px;filter:grayscale(.15)}
+  @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  .panel h1{margin:0 0 10px;font-size:21px}
+  .panel p{margin:0 0 26px;font-size:13.5px;color:var(--ink-3);line-height:1.9}
+  .tipbox{margin-top:34px;padding:18px 22px;border-radius:18px;background:#f8fafb;
+    font-size:12.5px;color:var(--ink-3);text-align:left;line-height:1.9}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html"><span class="mark">N</span>Nova Stream</a>
+  <form class="search" onsubmit="event.preventDefault();location.href='search.html'">
+    <span>🔍</span><input type="text" placeholder="搜索视频、创作者、分类">
+  </form>
+  <nav class="topnav">
+    <a href="index.html">首页</a>
+    <a href="categories.html">分类</a>
+    <a href="creators.html">创作者</a>
+    <a href="friends.html">好友</a>
+    <a href="upload.html">创作中心</a>
+    <a href="profile.html">我的</a>
+  </nav>
+  <a href="profile.html"><img class="avatar ph-2" alt="头像"></a>
+</header>
+
+<div class="empty-wrap">
+  <div class="panel">
+    <div class="illus"><div class="box"><span>📭</span></div></div>
+    <h1>这里还什么都没有</h1>
+    <p>你还没有订阅任何创作者<br>订阅之后，他们的新视频会出现在这里</p>
+    <a class="btn btn-primary" href="creators.html">去看看创作者</a>
+
+    <div class="tipbox">
+      空状态是页面设计里最容易被忽略的一块。它要告诉用户三件事：<br>
+      现在是什么情况、为什么会这样、接下来能做什么。<br>
+      所以这里留了一个明确的操作按钮，而不是干瞪眼。
+    </div>
+  </div>
+</div>
+<script src="js/notify.js"></script>
+</body>
+</html>

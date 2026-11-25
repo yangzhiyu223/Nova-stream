@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Stream · 动态</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/extra.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html"><span class="mark">N</span>Nova Stream</a>
+  <form class="search" onsubmit="event.preventDefault();location.href='search.html'">
+    <span>🔍</span><input type="text" placeholder="搜索创作者">
+  </form>
+  <nav class="topnav">
+    <a href="index.html">首页</a>
+    <a href="categories.html">分类</a>
+    <a href="creators.html" class="active">创作者</a>
+    <a href="friends.html">好友</a>
+    <a href="upload.html">创作中心</a>
+    <a href="profile.html">我的</a>
+  </nav>
+  <a href="profile.html"><img class="avatar ph-3" alt="头像"></a>
+</header>
+
+<div class="feed-wrap">
+  <a class="feed-back" href="profile.html">← 返回我的</a>
+  <div class="feed-head">
+    <h1 id="feedTitle">动态</h1>
+    <p id="feedSub">你关注的创作者最近在发什么</p>
+  </div>
+  <div class="feed-list" id="feedList"></div>
+</div>
+
+<script src="js/data.js"></script>
+<script>
+  const q = new URLSearchParams(location.search);
+  const who = q.get("u");
+
+  /* 全部动态 */
+  const POSTS = [
+    { who:"Maya Chen", ava:"ph-1", time:"10 分钟前",
+      txt:"新一期视频剪完了，凌晨的海边风好大，但值。",
+      v:"海边的日落延时摄影" },
+    { who:"Tom's Tech", ava:"ph-3", time:"1 小时前",
+      txt:"桌面改造又买了一个新东西，先不说是啥，明天见。",
+      v:"桌面布置第二期" },
+    { who:"Lila Travels", ava:"ph-5", time:"3 小时前",
+      txt:"在路上第 6 天，今天终于找到那个很小的海湾。",
+      v:"一个人的旅行清单" },
+    { who:"Studio Vlogs", ava:"ph-7", time:"昨天",
+      txt:"下雨天最适合剪片，顺手录了一段。",
+      v:"雨夜城市 · 慢镜头" },
+    { who:"Cooking with Ben", ava:"ph-4", time:"2 天前",
+      txt:"一周只吃家常菜，第三天开始想念外卖了。",
+      v:"一周只吃家常菜" },
+    { who:"Music Vibes", ava:"ph-8", time:"3 天前",
+      txt:"白噪音一小时版本上传了，写作业用。",
+      v:"雨后森林 · 白噪音一小时" }
+  ];
+
+  /* 新粉丝 */
+  const FANS = [
+    { who:"Luna Park", ava:"ph-7", time:"3 小时前", txt:"关注了你" },
+    { who:"Kai Tanaka", ava:"ph-6", time:"昨天", txt:"关注了你" },
+    { who:"Aria Wong", ava:"ph-8", time:"2 天前", txt:"关注了你" },
+    { who:"Maya Chen", ava:"ph-1", time:"4 天前", txt:"关注了你" },
+    { who:"Studio Vlogs", ava:"ph-7", time:"上周", txt:"关注了你" }
+  ];
+
+  function creatorOf(n){ return CREATORS.find(c => c.n === n) || { ph:1 }; }
+  function uri(s){ return encodeURIComponent(s); }
+
+  function postCard(p){
+    const c = creatorOf(p.who);
+    const v = VIDEOS.find(x => x.t === p.v);
+    return `
+      <article class="feed-card">
+        <a href="creator.html?u=${uri(p.who)}&from=feed" title="${p.who}">
+          <div class="ava ph-${c.ph}"></div>
+        </a>
+        <div class="feed-body">
+          <p><a href="creator.html?u=${uri(p.who)}&from=feed"><b>${p.who}</b></a> ${p.txt}</p>
+          <span class="time">${p.time}</span>
+          ${v ? `<a class="feed-thumb" href="watch.html?t=${uri(v.t)}&u=${uri(v.c)}">
+                   <div class="ph ph-${v.ph}"></div>
+                   <span>${v.t} · ${v.d}</span>
+                 </a>` : ""}
+          <div class="feed-acts">
+            <a href="creator.html?u=${uri(p.who)}#feed">查看主页</a>
+            <a href="#" onclick="event.preventDefault();this.textContent='已赞 👍'">点赞</a>
+          </div>
+        </div>
+      </article>`;
+  }
+
+  function fanCard(f){
+    const c = creatorOf(f.who);
+    return `
+      <article class="feed-card">
+        <a href="creator.html?u=${uri(f.who)}&from=feed" title="${f.who}">
+          <div class="ava ph-${c.ph}"></div>
+        </a>
+        <div class="feed-body">
+          <p><a href="creator.html?u=${uri(f.who)}&from=feed"><b>${f.who}</b></a> ${f.txt}</p>
+          <span class="time">${f.time}</span>
+          <div class="feed-acts">
+            <a href="creator.html?u=${uri(f.who)}&from=feed">查看主页</a>
+            <a href="#" onclick="event.preventDefault();toggleSub('${f.who}');this.textContent=isSub('${f.who}')?'已回关':'回关'">${isSub(f.who)?'已回关':'回关'}</a>
+          </div>
+        </div>
+      </article>`;
+  }
+
+  const list = document.getElementById("feedList");
+  if (q.get("type") === "fans"){
+    document.getElementById("feedTitle").textContent = "新粉丝";
+    document.getElementById("feedSub").textContent = "最近关注你的人，点进去能看主页";
+    list.innerHTML = FANS.map(fanCard).join("");
+  } else {
+    list.innerHTML = POSTS.map(postCard).join("");
+  }
+</script>
+<script src="js/notify.js"></script>
+</body>
+</html>

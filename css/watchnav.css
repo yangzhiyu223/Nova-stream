@@ -1,0 +1,19 @@
+/* 播放页顶部返回导航 */
+.crumb-bar{
+  max-width:1240px;margin:22px auto 0;padding:0 24px;
+  display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+}
+.crumb-bar .btn{
+  height:38px;padding:0 16px;border-radius:999px;font-size:13px;
+  display:inline-flex;align-items:center;gap:6px;flex:0 0 auto;
+}
+.crumb-bar .crumb{
+  font-size:12.5px;color:var(--ink-3);min-width:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.crumb-bar .crumb b{font-weight:600;color:var(--ink-2)}
+
+@media(max-width:620px){
+  .crumb-bar{padding:0 14px;margin-top:16px}
+  .crumb-bar .crumb{font-size:12px}
+}

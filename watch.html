@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Stream · 播放</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/extra.css">
+<link rel="stylesheet" href="css/comments.css">
+<link rel="stylesheet" href="css/watchnav.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html"><span class="mark">N</span>Nova Stream</a>
+  <form class="search" onsubmit="event.preventDefault();location.href='search.html'">
+    <span>🔍</span><input type="text" placeholder="搜索视频、创作者、分类">
+  </form>
+  <nav class="topnav">
+    <a href="index.html">首页</a>
+    <a href="categories.html">分类</a>
+    <a href="creators.html">创作者</a>
+    <a href="friends.html">好友</a>
+    <a href="upload.html">创作中心</a>
+    <a href="profile.html">我的</a>
+  </nav>
+  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+</header>
+
+<div class="crumb-bar">
+  <a class="btn btn-ghost" href="#" onclick="back();return false" id="backBtn">← 返回</a>
+  <span class="crumb">首页 / 分类 / <b id="crumbNow">城市夜景延时 · 上海天际线</b></span>
+</div>
+
+<div class="watch">
+  <div>
+    <div class="player-card">
+      <div class="stage" id="stage">
+        <div class="art"></div>
+        <button class="big-play" id="bigPlay">▶</button>
+        <div class="phint">这是占位画面，没有真实视频文件</div>
+
+        <div class="glass">
+          <div class="progress" id="bar">
+            <div class="tip" id="tip">00:00</div>
+            <div class="track"><div class="fill" id="fill"></div></div>
+  </div>
+          <div class="ctrl">
+            <button onclick="back()" title="返回">↩</button>
+            <button id="pp" title="播放/暂停">▶</button>
+            <span class="time" id="time">03:20 / 10:00</span>
+            <div class="spacer"></div>
+            <button onclick="toast('已开启/关闭弹幕')" title="弹幕">💬</button>
+            <button onclick="toast('音量 +')" title="音量">🔊</button>
+            <button class="round" onclick="toast('已切换全屏')" title="全屏">⛶</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="vinfo">
+        <div>
+          <h1>城市夜景延时 · 上海天际线</h1>
+          <div class="row">
+            <span class="dur" style="background:#f2f6f9;color:#5b6472;padding:3px 10px;border-radius:8px">12.8 万次播放</span>
+            <span>2026-11-12</span>
+            <span>· MV-1080P</span>
+          </div>
+        </div>
+        <div class="vacts">
+          <button class="vact" onclick="like(this)">👍 <span>点赞</span></button>
+          <button class="vact teal" onclick="like(this)">🪙 <span>投币</span></button>
+          <button class="vact" onclick="like(this)">⭐ <span>收藏</span></button>
+          <button class="vact" onclick="toast('分享链接已复制')">↗ 分享</button>
+          <button class="vact" onclick="jumpCm()">💬 留言 <span id="vactCount">128</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 留言面板 -->
+    <section class="cm-panel" id="cmPanel">
+      <div class="cm-top">
+        <h2>留言 · <span id="cmCount">128</span></h2>
+        <div class="cm-sort">
+          <button class="on" data-sort="hot" onclick="setSort(this)">最热</button>
+          <button data-sort="new" onclick="setSort(this)">最新</button>
+        </div>
+      </div>
+
+      <div class="cm-editor">
+        <div class="ava ph-1" style="border-radius:50%"></div>
+        <div class="ed-main">
+          <textarea id="cmIn" placeholder="发一条友善的留言…" maxlength="200"
+                    oninput="onInput()" onkeydown="cmKey(event)"></textarea>
+          <div class="ed-bar">
+            <span class="counter"><span id="cnt">0</span>/200</span>
+            <span class="hint">Ctrl + Enter 发送</span>
+            <button class="btn btn-primary" style="height:38px;padding:0 22px;font-size:13.5px" onclick="sendCm()">发送</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="cm-list" id="cmList"></div>
+
+      <button class="cm-more" id="cmMore" onclick="loadMore()">加载更多留言</button>
+    </section>
+
+    <div class="card" style="margin-top:22px;padding:20px 24px" id="creatorCard">
+      <div style="display:flex;gap:14px;align-items:center">
+        <img class="avatar ph-1" style="width:44px;height:44px" alt="头像">
+        <div>
+          <div style="font-weight:700;font-size:15px">Maya Chen</div>
+          <div class="tiny">1.2M 粉丝 · 生活 / 旅行</div>
+        </div>
+        <button class="btn btn-primary" style="height:40px;padding:0 22px;margin-left:auto" id="follow" onclick="followBtn(this)">关注</button>
+      </div>
+      <p style="margin:16px 0 0;font-size:13.5px;line-height:1.9;color:var(--ink-2)">
+        第一次在这个角度拍城市延时，从傍晚一直守到灯全亮起来。
+        设备用的是常规机身，后期只做了轻微调色，希望你们喜欢。
+      </p>
+    </div>
+  </div>
+
+  <aside class="rec">
+    <h2>接下来看</h2>
+    <div id="recList"></div>
+  </aside>
+</div>
+
+<!-- 评论抽屉已改成页面内常驻留言面板 -->
+
+<div id="toast" style="position:fixed;left:50%;bottom:40px;translate:-50% 0;padding:11px 20px;border-radius:999px;background:rgba(24,30,42,.88);color:#fff;font-size:13px;opacity:0;transition:.26s;pointer-events:none;z-index:99"></div>
+
+<script src="js/data.js"></script>
+<script>
+  /* ---- 推荐列表 ---- */
+  document.getElementById("recList").innerHTML = RECOMMEND.map(v => `
+    <a class="rec-item" href="watch.html?t=${encodeURIComponent(v.t)}&u=${encodeURIComponent(v.c)}">
+      <div class="thumb ph-${v.ph}"></div>
+      <div>
+        <h3>${v.t}</h3>
+        <div class="sub">${v.c} · ${v.v}</div>
+      </div>
+    </a>`).join("");
+
+  /* ---- 播放器 ---- */
+  const stage = document.getElementById("stage");
+  const fill = document.getElementById("fill");
+  const timeEl = document.getElementById("time");
+  const pp = document.getElementById("pp");
+  const bar = document.getElementById("bar");
+  const tip = document.getElementById("tip");
+  const TOTAL = 600;
+  let cur = 200, playing = false, timer = null;
+
+  function fmt(s){
+    const m = Math.floor(s/60), ss = Math.floor(s%60);
+    return String(m).padStart(2,"0")+":"+String(ss).padStart(2,"0");
+  }
+  function paint(){
+    fill.style.width = (cur/TOTAL*100)+"%";
+    timeEl.textContent = fmt(cur)+" / "+fmt(TOTAL);
+  }
+  function play(){
+    playing = true;
+    pp.textContent = "⏸";
+    stage.classList.add("playing");
+    stage.classList.remove("paused");
+    stage.classList.add("show-hint");
+    stage.classList.remove("show-ctrl");
+    setTimeout(()=>stage.classList.remove("show-hint"), 1600);
+    timer = setInterval(()=>{
+      cur = Math.min(TOTAL, cur + 1);
+      paint();
+      if (cur >= TOTAL) pause();
+    }, 1000);
+  }
+  function pause(){
+    playing = false;
+    pp.textContent = "▶";
+    stage.classList.remove("playing");
+    stage.classList.add("paused");
+    stage.classList.add("show-ctrl");
+    clearInterval(timer);
+  }
+  function toggle(){ playing ? pause() : play(); }
+
+  pp.onclick = toggle;
+  document.getElementById("bigPlay").onclick = play;
+
+  /* 悬停进度条显示时间预览 */
+  bar.addEventListener("mousemove", e => {
+    const r = bar.getBoundingClientRect();
+    const p = Math.min(1, Math.max(0, (e.clientX - r.left)/r.width));
+    tip.textContent = fmt(p*TOTAL);
+    tip.style.left = (p*100)+"%";
+  });
+  bar.addEventListener("click", e => {
+    const r = bar.getBoundingClientRect();
+    cur = Math.round(Math.min(1, Math.max(0,(e.clientX-r.left)/r.width))*TOTAL);
+    paint();
+  });
+
+  /* 点播放区切换控制栏，悬停不再自动弹出 */
+  stage.addEventListener("click", e=>{
+    if (e.target.closest(".glass") || e.target.closest(".big-play")) return;
+    stage.classList.toggle("show-ctrl");
+  });
+
+  function back(){
+    if (history.length > 1 && document.referrer && !document.referrer.includes("watch.html")){
+      history.back();
+      setTimeout(()=>{ if(!document.hidden) location.href = "index.html"; }, 400);
+    } else {
+      location.href = "index.html";
+    }
+  }
+  document.getElementById("crumbNow").textContent =
+    document.querySelector(".vinfo h1")?.textContent?.trim() || "视频播放";
+
+  /* ---- 点赞/投币/收藏 ---- */
+  function like(btn){
+    const on = btn.classList.toggle("on");
+    const label = btn.querySelector("span");
+    if (!btn.dataset.raw) btn.dataset.raw = label.textContent;
+    label.textContent = on ? btn.dataset.raw + " 了" : btn.dataset.raw;
+  }
+  function followBtn(b){
+    const on = b.dataset.on === "1";
+    b.dataset.on = on ? "0" : "1";
+    b.textContent = on ? "关注" : "已关注";
+    b.style.background = on ? "" : "linear-gradient(100deg,#0aa395,#2ec9ba)";
+    b.style.boxShadow = on ? "" : "0 8px 20px rgba(20,184,166,.26)";
+  }
+
+  /* ---- 留言面板 ---- */
+  let CM = [
+    { id:1, n:"橘子汽水", t:"这个转场太丝滑了，求教一下参数，是手持还是稳定器？", s:"2 小时前", like:126, me:false, rep:[] },
+    { id:2, n:"小鹿乱撞", t:"南京西路那段我熟，晚上确实好看，就是人太多了", s:"5 小时前", like:84, me:false,
+      rep:[{ n:"Maya Chen", t:"对，得挑工作日去，周末挤不进去" }] },
+    { id:3, n:"阿强", t:"已经收藏，下次去上海照着走一遍", s:"6 小时前", like:41, me:false, rep:[] },
+    { id:4, n:"夜色", t:"配乐是什么名字啊，找了好久没找到", s:"昨天", like:33, me:false,
+      rep:[{ n:"橘子汽水", t:"好像是原创的，评论区有人提过" }] },
+    { id:5, n:"Kaya", t:"看了一整遍，很治愈，久违的慢节奏", s:"昨天", like:27, me:false, rep:[] },
+    { id:6, n:"老周不打烊", t:"调色偏暖，跟上海那种湿冷的天气正好对上了", s:"2 天前", like:19, me:false, rep:[] },
+    { id:7, n:"一只小满", t:"相机型号求告知，谢谢～", s:"2 天前", like:12, me:false, rep:[] },
+    { id:8, n:"夜里三点", t:"看到最后那句「守到灯全亮」有点感动", s:"3 天前", like:9, me:false, rep:[] }
+  ];
+  let sortBy = "hot", shown = 5, replyTo = null;
+
+  function esc(s){
+    return String(s).replace(/[&<>"']/g, m => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[m]));
+  }
+  function sorted(){
+    const arr = [...CM];
+    return sortBy === "hot"
+      ? arr.sort((a,b)=> b.like - a.like)
+      : arr.sort((a,b)=> b.id - a.id);
+  }
+  function renderCm(){
+    const list = sorted();
+    const slice = list.slice(0, shown);
+    document.getElementById("cmList").innerHTML = slice.length ? slice.map((c,i)=>{
+      const av = (c.id % 8) + 1;
+      return `
+      <div class="cm">
+        <div class="ava ph-${av}" style="border-radius:50%"></div>
+        <div class="cm-body">
+          <p class="name">${esc(c.n)} <span>· ${esc(c.s)}</span></p>
+          <p class="txt">${esc(c.t)}</p>
+          <div class="cm-acts">
+            <button class="likebtn ${c.me?'on':''}" onclick="likeCm(${c.id})">
+              👍 <span>${c.like || ""}</span>
+            </button>
+            <button onclick="replyToCm(${c.id}, '${esc(c.n)}')">回复</button>
+          </div>
+          ${c.rep.length ? `<div class="reps">${c.rep.map(r=>`
+            <div class="rep"><b>${esc(r.n)}</b>：${esc(r.t)}</div>`).join("")}</div>` : ""}
+        </div>
+      </div>`;
+    }).join("") : `
+      <div class="cm-empty">
+        <div class="ico">💬</div>
+        <p>还没有留言，来抢第一条</p>
+      </div>`;
+
+    document.getElementById("cmMore").style.display = list.length > shown ? "inline-flex" : "none";
+    document.getElementById("cmCount").textContent = 128 + CM.filter(c=>c.me).length;
+  }
+  function setSort(btn){
+    sortBy = btn.dataset.sort;
+    document.querySelectorAll(".cm-sort button").forEach(b=>b.classList.remove("on"));
+    btn.classList.add("on");
+    shown = 5;
+    renderCm();
+  }
+  function loadMore(){ shown += 5; renderCm(); }
+
+  function likeCm(id){
+    const c = CM.find(x=>x.id === id); if (!c) return;
+    if (c.me) { c.like--; c.me = false; } else { c.like++; c.me = true; }
+    renderCm();
+  }
+  function replyToCm(id, name){
+    replyTo = { id, name };
+    const inp = document.getElementById("cmIn");
+    inp.value = "@" + name + " ";
+    inp.focus();
+    onInput();
+    document.getElementById("cmPanel").scrollIntoView({ behavior:"smooth", block:"center" });
+  }
+  function onInput(){
+    document.getElementById("cnt").textContent = document.getElementById("cmIn").value.length;
+  }
+  function cmKey(e){
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) { e.preventDefault(); sendCm(); }
+    else if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendCm(); }
+  }
+  function sendCm(){
+    const inp = document.getElementById("cmIn");
+    const v = inp.value.trim();
+    if (!v) { toast("说点什么再发吧"); inp.focus(); return; }
+    const id = Math.max(...CM.map(x=>x.id)) + 1;
+    const body = v.replace(/^@\S+\s*/, "");
+    const item = { id, n:"我", t:body, s:"刚刚", like:0, me:false, rep:[] };
+
+    if (replyTo && v.startsWith("@" + replyTo.name)) {
+      const target = CM.find(x=>x.id === replyTo.id);
+      if (target) target.rep.push({ n:"我", t:body });
+      else CM.unshift(item);
+    } else {
+      CM.unshift(item);
+    }
+    replyTo = null;
+    inp.value = "";
+    onInput();
+    sortBy = "new";
+    document.querySelectorAll(".cm-sort button").forEach(b=>b.classList.toggle("on", b.dataset.sort === "new"));
+    shown = Math.max(shown, 5);
+    renderCm();
+    toast("留言已发布");
+  }
+
+  function jumpCm(){
+    const p = document.getElementById("cmPanel");
+    if (!p) return;
+    const y = p.getBoundingClientRect().top + window.scrollY - 90;
+    window.scrollTo({ top: y, behavior: "smooth" });
+  }
+
+  document.addEventListener("DOMContentLoaded", renderCm);
+
+  /* ---- toast ---- */
+  let tt;
+  function toast(msg){
+    const el = document.getElementById("toast");
+    el.textContent = msg;
+    el.style.opacity = 1;
+    el.style.translate = "-50% -6px";
+    clearTimeout(tt);
+    tt = setTimeout(()=>{ el.style.opacity = 0; el.style.translate = "-50% 0"; }, 1800);
+  }
+
+  paint();
+</script>
+<script src="js/data.js"></script>
+<script>
+  // 支持 watch.html?t=标题&u=创作者
+  (function(){
+    const q = new URLSearchParams(location.search);
+    const tid = q.get("t"), uid = q.get("u");
+    if (!tid && !uid) return;
+    const v = tid ? VIDEOS.find(x => x.t === tid) : null;
+    const who = uid || (v && v.c);
+    if (v){
+      document.querySelector(".vinfo h1").textContent = v.t;
+      document.title = "Nova Stream · " + v.t;
+      const play = document.querySelector(".vinfo .dur");
+      if (play) play.textContent = v.v + " 次播放";
+    }
+    const h1 = document.querySelector(".vinfo h1");
+    if (who && h1){
+      const a = document.createElement("a");
+      a.className = "vcreator";
+      a.href = "creator.html?u=" + encodeURIComponent(who) + "&from=watch";
+      a.innerHTML = '<span class="ava ph-' + (CREATORS.find(c=>c.n===who)||{ph:1}).ph + '"></span>' + who;
+      h1.after(a);
+    }
+    document.getElementById("crumbNow").textContent = (v ? v.t : "视频播放");
+  })();
+</script>
+<script src="js/notify.js"></script>
+</body>
+</html>

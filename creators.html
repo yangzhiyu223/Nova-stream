@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Stream · 创作者</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/extra.css">
+<style>
+  .cr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:22px;margin-top:8px}
+  .cr{
+    background:#fff;border-radius:24px;padding:24px 18px 18px;text-align:center;
+    box-shadow:var(--sh-sm);transition:.24s;position:relative;border:1px solid transparent;
+  }
+  .cr:hover{transform:translateY(-5px);box-shadow:var(--sh-lg);border-color:#ffe2cd}
+  .cr .ava{width:86px;height:86px;border-radius:50%;margin:0 auto 14px;border:3px solid #fff;
+    box-shadow:0 10px 24px rgba(28,35,48,.12)}
+  .cr h3{margin:0 0 6px;font-size:15px}
+  .cr .d{font-size:12.5px;color:var(--ink-3);margin:0 0 4px}
+  .cr .f{font-size:12px;color:var(--ink-3);margin:0 0 16px}
+  .cr .btn{height:38px;padding:0 20px;font-size:13px;border-radius:999px}
+  .badge{
+    position:absolute;right:14px;top:14px;padding:3px 10px;border-radius:999px;
+    font-size:11.5px;font-weight:700;color:#fff;background:linear-gradient(100deg,#f97316,#fb8c3c);
+  }
+  .cr .live{background:linear-gradient(100deg,#14b8a6,#2ec9ba)}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html"><span class="mark">N</span>Nova Stream</a>
+  <form class="search" onsubmit="event.preventDefault();location.href='search.html'">
+    <span>🔍</span><input type="text" placeholder="搜索创作者">
+  </form>
+  <nav class="topnav">
+    <a href="index.html">首页</a>
+    <a href="categories.html">分类</a>
+    <a href="creators.html" class="active">创作者</a>
+    <a href="friends.html">好友</a>
+    <a href="upload.html">创作中心</a>
+    <a href="profile.html">我的</a>
+  </nav>
+  <a href="profile.html"><img class="avatar ph-3" alt="头像"></a>
+</header>
+
+<div style="max-width:1120px;margin:0 auto;padding:34px 26px 70px">
+  <div class="sec-head">
+    <h1 style="margin:0;font-size:23px">发现创作者</h1>
+    <button class="btn btn-ghost" id="onlySub" style="height:38px;padding:0 18px;font-size:13px;border-radius:999px">只看已订阅</button>
+  </div>
+  <div class="cr-grid" id="grid"></div>
+  <div id="noneSub" class="none-sub" style="display:none">
+    <p>还没订阅谁，点一下订阅试试 :)</p>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script>
+  const grid = document.getElementById("grid");
+  let onlySubMode = false;
+
+  function badgeOf(c, i){
+    if (isSub(c.n)) return '<span class="badge">已订阅</span>';
+    if (i === 3) return '<span class="badge live">直播中</span>';
+    return "";
+  }
+
+  function render(){
+    const list = CREATORS.filter(c => !onlySubMode || isSub(c.n));
+    document.getElementById("noneSub").style.display = list.length ? "none" : "";
+    grid.innerHTML = list.map((c) => {
+      const on = isSub(c.n);
+      return `
+      <div class="cr" data-name="${c.n}">
+        ${badgeOf(c, CREATORS.indexOf(c))}
+        <a href="creator.html?u=${encodeURIComponent(c.n)}" title="查看 ${c.n} 的主页">
+          <div class="ava ph-${c.ph}" style="border-radius:50%"></div>
+        </a>
+        <h3><a href="creator.html?u=${encodeURIComponent(c.n)}" style="color:inherit">${c.n}</a></h3>
+        <p class="d">${c.d}</p>
+        <p class="f">${c.f} 粉丝</p>
+        <button class="btn ${on ? "btn-ghost" : "btn-primary"} sub-btn" data-n="${c.n}">
+          ${on ? "已订阅 ✓" : "订阅"}
+        </button>
+      </div>`;
+    }).join("");
+  }
+
+  grid.addEventListener("click", e => {
+    const b = e.target.closest(".sub-btn");
+    if (!b) return;
+    const name = b.dataset.n;
+    const on = toggleSub(name);
+    const card = grid.querySelector(`.cr[data-name="${CSS.escape(name)}"]`);
+    if (card){
+      const old = card.querySelector(".badge");
+      if (old && old.classList.contains("badge") && !old.classList.contains("live")) old.remove();
+      if (on && !card.querySelector(".badge"))
+        card.insertAdjacentHTML("afterbegin", '<span class="badge">已订阅</span>');
+    }
+    render();
+  });
+
+  document.getElementById("onlySub").addEventListener("click", e => {
+    onlySubMode = !onlySubMode;
+    e.currentTarget.classList.toggle("btn-primary", onlySubMode);
+    e.currentTarget.classList.toggle("btn-ghost", !onlySubMode);
+    e.currentTarget.textContent = onlySubMode ? "看全部创作者" : "只看已订阅";
+    render();
+  });
+
+  // 别的标签页改了订阅，这里跟着刷新
+  window.addEventListener("storage", e => { if (e.key === "ns_subs") render(); });
+  document.addEventListener("subs:change", render);
+
+  render();
+</script>
+<script src="js/notify.js"></script>
+</body>
+</html>

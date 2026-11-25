@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Stream · 好友</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/extra.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html"><span class="mark">N</span>Nova Stream</a>
+  <form class="search" onsubmit="event.preventDefault();location.href='search.html'">
+    <span>🔍</span><input type="text" placeholder="搜索视频、创作者、分类">
+  </form>
+  <nav class="topnav">
+    <a href="index.html">首页</a>
+    <a href="categories.html">分类</a>
+    <a href="creators.html">创作者</a>
+    <a href="friends.html" class="active">好友</a>
+    <a href="upload.html">创作中心</a>
+    <a href="profile.html">我的</a>
+  </nav>
+  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+</header>
+
+<div class="fd-wrap">
+  <div class="fd-head">
+    <div>
+      <h1>好友</h1>
+      <p id="fdSub">18 位好友 · 6 个新的好友请求</p>
+    </div>
+    <label class="fd-search">🔍<input id="fdQ" type="text" placeholder="搜好友名字"></label>
+  </div>
+
+  <div class="fd-tabs" id="fdTabs">
+    <button class="on" data-tab="all">全部好友</button>
+    <button data-tab="req">好友请求 <span id="reqNum">6</span></button>
+    <button data-tab="chat">私信</button>
+  </div>
+
+  <div id="fdPane"></div>
+</div>
+
+<script src="js/data.js"></script>
+<script>
+  /* ---------- 好友数据 ---------- */
+  const FRIENDS = [
+    { n:"Maya Chen", ava:"ph-1", d:"生活 · 旅行 · 创意", on:true,  tag:"经常聊" },
+    { n:"Tom's Tech", ava:"ph-3", d:"数码 · 评测", on:true, tag:"常看视频" },
+    { n:"Lila Travels", ava:"ph-5", d:"旅行 · 影像", on:false, tag:"旅行同好" },
+    { n:"GameZone", ava:"ph-6", d:"游戏 · 实况", on:true,  tag:"开黑搭子" },
+    { n:"Cooking with Ben", ava:"ph-4", d:"美食 · 日常", on:false, tag:"" },
+    { n:"Fit Life", ava:"ph-2", d:"健身 · 生活方式", on:false, tag:"" },
+    { n:"Music Vibes", ava:"ph-8", d:"音乐 · 现场", on:true, tag:"白噪音" },
+    { n:"Studio Vlogs", ava:"ph-7", d:"影像 · Vlog", on:false, tag:"" },
+    { n:"Luna Park", ava:"ph-7", d:"手作 · 画画", on:true, tag:"" },
+    { n:"Kai Tanaka", ava:"ph-6", d:"摄影 · 街拍", on:false, tag:"" },
+    { n:"Aria Wong", ava:"ph-8", d:"音乐 · 翻唱", on:true, tag:"经常聊" },
+    { n:"Neo Lin", ava:"ph-2", d:"读书 · 笔记", on:false, tag:"" }
+  ];
+
+  const REQUESTS = [
+    { n:"Ethan Zhao", ava:"ph-3", d:"想加你一起做视频", mutual:"3 位共同好友" },
+    { n:"Mira Sun", ava:"ph-1", d:"看了你的合集来的", mutual:"1 位共同好友" },
+    { n:"Leo Wu", ava:"ph-6", d:"游戏区 UP", mutual:"5 位共同好友" },
+    { n:"Sora Lee", ava:"ph-4", d:"美食博主，互关吗", mutual:"无共同好友" },
+    { n:"Ivy Chen", ava:"ph-5", d:"同行，想请教剪辑", mutual:"2 位共同好友" },
+    { n:"Rex Han", ava:"ph-8", d:"音乐区，一起合作？", mutual:"无共同好友" }
+  ];
+
+  const CONVS = {
+    "Maya Chen": [
+      { me:false, t:"你上次说的那个镜头参数发我一下呗" },
+      { me:true,  t:"等下，我翻翻硬盘" },
+      { me:false, t:"不急不急，你慢慢找" },
+      { me:true,  t:"找到了，25mm f2.8 全程手动" }
+    ],
+    "Tom's Tech": [
+      { me:false, t:"新桌面那期拍完了没" },
+      { me:true,  t:"拍完了，剪到一半" }
+    ],
+    "Aria Wong": [
+      { me:true,  t:"你那条翻唱好稳啊" },
+      { me:false, t:"哈哈谢谢，副歌录了八百遍" }
+    ]
+  };
+
+  const KEY = "ns_friends";
+  function getState(){
+    let v = null;
+    try { v = JSON.parse(localStorage.getItem(KEY)); } catch(e){}
+    if (!v || typeof v !== "object"){
+      v = { added:[], reqDone:[] };
+      localStorage.setItem(KEY, JSON.stringify(v));
+    }
+    return v;
+  }
+  function saveState(v){ localStorage.setItem(KEY, JSON.stringify(v)); }
+  function friendList(){ const s = getState(); return FRIENDS.filter(f => !s.reqDone.includes("x:" + f.n)); }
+
+  let tab = "all";
+  let q = "";
+  let conv = "Maya Chen";
+  const extraMsgs = {};
+
+  function uri(s){ return encodeURIComponent(s); }
+
+  /* ---------- 渲染 ---------- */
+  function friendCard(f){
+    return `
+      <article class="fd-card" data-name="${f.n}">
+        <div class="fd-card-top">
+          <a href="creator.html?u=${uri(f.n)}&from=friends" title="${f.n}" style="position:relative;display:block;flex:0 0 46px">
+            <div class="ava ph-${f.ava}"></div>
+            <i class="fd-online ${f.on ? "on" : ""}"></i>
+          </a>
+          <div class="who">
+            <a href="creator.html?u=${uri(f.n)}&from=friends"><b>${f.n}</b></a>
+            <span>${f.on ? "在线" : "离线"}${f.tag ? " · " + f.tag : ""}</span>
+          </div>
+        </div>
+        <p class="fd-desc">${f.d}</p>
+        <div class="fd-foot">
+          <a class="btn btn-ghost" href="creator.html?u=${uri(f.n)}&from=friends">主页</a>
+          <a class="btn btn-main" href="#" data-chat="${f.n}">发消息</a>
+        </div>
+      </article>`;
+  }
+
+  function reqCard(r){
+    const st = getState();
+    const done = st.added.includes(r.n);
+    return `
+      <article class="fd-card" data-name="${r.n}">
+        <div class="fd-card-top">
+          <a href="creator.html?u=${uri(r.n)}&from=friends" style="display:block;flex:0 0 46px"><div class="ava ph-${r.ava}"></div></a>
+          <div class="who">
+            <a href="creator.html?u=${uri(r.n)}&from=friends"><b>${r.n}</b></a>
+            <span>${r.mutual} · ${r.d}</span>
+          </div>
+        </div>
+        <div class="fd-foot">
+          <button class="btn btn-ghost" data-ignore="${r.n}">忽略</button>
+          <button class="btn btn-main ${done ? "done" : ""}" data-accept="${r.n}">${done ? "已添加" : "同意"}</button>
+        </div>
+      </article>`;
+  }
+
+  function chatPane(){
+    const names = Object.keys(CONVS).filter(n => !getState().reqDone.includes("x:" + n));
+    const list = names.map(n => {
+      const f = FRIENDS.find(x => x.n === n) || { ava:"ph-1" };
+      const msgs = (CONVS[n] || []).concat(extraMsgs[n] || []);
+      const last = msgs[msgs.length - 1] || { t:"" };
+      return `
+        <div class="fd-conv ${n === conv ? "on" : ""}" data-conv="${n}">
+          <div class="ava ph-${f.ava}"></div>
+          <div class="txt"><b>${n}</b><span>${last.t}</span></div>
+        </div>`;
+    }).join("");
+
+    const f = FRIENDS.find(x => x.n === conv) || { ava:"ph-1", on:false };
+    const msgs = (CONVS[conv] || []).concat(extraMsgs[conv] || []);
+    const body = msgs.map(m => `<div class="fd-msg ${m.me ? "me" : "them"}">${m.t}</div>`).join("");
+
+    return `
+      <div class="fd-chat">
+        <div class="fd-convs">${list}</div>
+        <div class="fd-chatbox">
+          <div class="fd-chathead">
+            <div class="ava ph-${f.ava}"></div>
+            <a href="creator.html?u=${uri(conv)}&from=friends"><b>${conv}</b></a>
+            <span style="font-size:11.5px;color:var(--ink-3)">${f.on ? "在线" : "离线"}</span>
+          </div>
+          <div class="fd-msgs" id="fdMsgs">${body}</div>
+          <form class="fd-input" onsubmit="sendMsg(event)">
+            <input id="fdInput" type="text" maxlength="200" placeholder="发条消息…">
+            <button type="submit">发送</button>
+          </form>
+        </div>
+      </div>`;
+  }
+
+  function render(){
+    const pane = document.getElementById("fdPane");
+    document.getElementById("reqNum").textContent = Math.max(0, REQUESTS.filter(r => !getState().reqDone.includes("x:" + r.n)).length);
+    document.querySelectorAll("#fdTabs button").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
+
+    if (tab === "req"){
+      const list = REQUESTS.filter(r => !getState().reqDone.includes("x:" + r.n));
+      pane.innerHTML = list.length
+        ? `<div class="fd-req">${list.map(reqCard).join("")}</div>`
+        : `<p class="fd-empty">没有新的好友请求了</p>`;
+      return;
+    }
+    if (tab === "chat"){ pane.innerHTML = chatPane(); scrollMsgs(); return; }
+
+    const list = friendList().filter(f => !q || f.n.toLowerCase().includes(q.toLowerCase()));
+    pane.innerHTML = list.length
+      ? `<div class="fd-grid">${list.map(friendCard).join("")}</div>`
+      : `<p class="fd-empty">没找到这个好友，换个词试试</p>`;
+  }
+
+  function scrollMsgs(){
+    const box = document.getElementById("fdMsgs");
+    if (box) box.scrollTop = box.scrollHeight;
+  }
+
+  /* ---------- 交互 ---------- */
+  function acceptReq(n){
+    const st = getState();
+    if (!st.added.includes(n)) st.added.push(n);
+    st.reqDone.push("x:" + n);
+    saveState(st);
+    const r = REQUESTS.find(x => x.n === n);
+    if (r && !FRIENDS.find(f => f.n === n)) FRIENDS.push({ n:r.n, ava:r.ava, d:r.d, on:true, tag:"" });
+    render();
+  }
+  function ignoreReq(n){
+    const st = getState();
+    st.reqDone.push("x:" + n);
+    saveState(st);
+    render();
+  }
+  function openChat(n){ tab = "chat"; conv = n; render(); }
+  function switchConv(n){ conv = n; render(); }
+  function sendMsg(e){
+    e.preventDefault();
+    const inp = document.getElementById("fdInput");
+    const t = (inp.value || "").trim();
+    if (!t) return;
+    (extraMsgs[conv] = extraMsgs[conv] || []).push({ me:true, t:t });
+    inp.value = "";
+    render();
+    setTimeout(() => {
+      (extraMsgs[conv] = extraMsgs[conv] || []).push({ me:false, t:"收到啦，等下回你～" });
+      render();
+    }, 700);
+  }
+
+  document.getElementById("fdPane").addEventListener("click", e => {
+    const a = e.target.closest("[data-accept]");
+    const i = e.target.closest("[data-ignore]");
+    const c = e.target.closest("[data-conv]");
+    const ch = e.target.closest("[data-chat]");
+    if (ch) { e.preventDefault(); openChat(ch.dataset.chat); return; }
+    if (a) { acceptReq(a.dataset.accept); return; }
+    if (i) { ignoreReq(i.dataset.ignore); return; }
+    if (c) { switchConv(c.dataset.conv); return; }
+  });
+
+  document.getElementById("fdTabs").addEventListener("click", e => {
+    const b = e.target.closest("button");
+    if (!b) return;
+    tab = b.dataset.tab;
+    render();
+  });
+  document.getElementById("fdQ").addEventListener("input", e => {
+    q = e.target.value.trim();
+    if (tab !== "all") { tab = "all"; }
+    render();
+  });
+
+  const init = new URLSearchParams(location.search);
+  if (init.get("tab")) tab = init.get("tab");
+  if (init.get("chat")) { tab = "chat"; conv = init.get("chat"); }
+  // 从主页按「返回好友」回来时，还停在刚才那个标签
+  if (init.get("tab")) history.replaceState(null, "", "friends.html?tab=" + encodeURIComponent(tab));
+  render();
+</script>
+<script src="js/notify.js"></script>
+</body>
+</html>

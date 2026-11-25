@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Stream · 我的</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/extra.css">
+<link rel="stylesheet" href="css/myworks.css">
+<style>
+  .pc-wrap{max-width:1040px;margin:0 auto;padding:30px 26px 70px;display:grid;grid-template-columns:230px 1fr;gap:24px}
+  .pc-menu{background:#fff;border-radius:26px;padding:22px 14px;box-shadow:var(--sh-md);height:max-content}
+  .pc-menu a{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:14px;
+    font-size:14px;color:var(--ink-2);transition:.2s;position:relative}
+  .pc-menu a:hover{background:#f6f8fa;color:var(--ink)}
+  .pc-menu a.on{color:var(--ink);font-weight:700;background:#f6f8fa}
+  .pc-menu a.on::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;
+    border-radius:3px;background:var(--orange)}
+  .pc-panel{background:#fff;border-radius:26px;padding:32px 34px;box-shadow:var(--sh-md)}
+  .pc-panel h1{margin:0 0 26px;font-size:22px}
+  .pf-hero{display:flex;align-items:center;gap:20px;margin-bottom:30px}
+  .pf-hero .ava{width:92px;height:92px;border-radius:50%;border:4px solid #fff;box-shadow:var(--sh-md)}
+  .pf-form .row{margin-bottom:18px}
+  .pf-form label{display:block;font-size:13px;color:var(--ink-2);margin-bottom:8px;font-weight:600}
+  .pf-form input,.pf-form textarea,.pf-form select{
+    width:100%;padding:0 18px;height:50px;border-radius:16px;border:1px solid #e8ebf0;
+    background:#fff;font-size:14px;color:var(--ink);transition:.2s;
+  }
+  .pf-form textarea{height:104px;padding:14px 18px;resize:vertical;line-height:1.7}
+  .pf-form input:focus,.pf-form textarea:focus,.pf-form select:focus{
+    border-color:var(--orange);box-shadow:0 0 0 4px rgba(249,115,22,.1);
+  }
+  .pf-form .btn-primary{width:100%;height:52px;margin-top:8px;font-size:15px}
+  .sw{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid #f4f6f9}
+  .sw:last-child{border:none}
+  .sw .k{font-size:14px}
+  .sw .k small{display:block;color:var(--ink-3);font-size:12px;margin-top:4px}
+  .toggle{width:48px;height:28px;border-radius:99px;background:#e6eaf0;position:relative;transition:.24s;flex:0 0 auto}
+  .toggle::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;
+    background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.14);transition:.24s}
+  .toggle.on{background:linear-gradient(100deg,#14b8a6,#2ec9ba)}
+  .toggle.on::after{left:23px}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html"><span class="mark">N</span>Nova Stream</a>
+  <form class="search" onsubmit="event.preventDefault();location.href='search.html'">
+    <span>🔍</span><input type="text" placeholder="搜索视频、创作者、分类">
+  </form>
+  <nav class="topnav">
+    <a href="index.html">首页</a>
+    <a href="categories.html">分类</a>
+    <a href="creators.html">创作者</a>
+    <a href="friends.html">好友</a>
+    <a href="upload.html">创作中心</a>
+    <a href="profile.html" class="active">我的</a>
+  </nav>
+  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+</header>
+
+<div class="pc-wrap">
+  <aside class="pc-menu">
+    <a href="#profile" class="on" data-pane-link="profile">👤 个人资料</a>
+    <a href="#works" data-pane-link="works">🎬 我的作品</a>
+    <a href="#" onclick="event.preventDefault();toast('我的收藏')">⭐ 收藏</a>
+    <a href="settings.html">⚙ 账号设置</a>
+    <a href="#" id="notiEntry">🔔 通知<i class="side-dot"></i></a>
+    <a href="feed.html">📣 动态</a>
+    <a href="feed.html?type=fans">👥 新粉丝</a>
+    <a href="messages.html">✉️ 消息</a>
+    <a href="friends.html">🤝 好友</a>
+    <a href="friends.html?tab=req">📥 好友请求</a>
+    <a href="friends.html?tab=chat">💬 私信</a>
+    <a href="login.html">↩ 退出登录</a>
+  </aside>
+
+  <section class="pc-panel" id="profile" data-pane="on">
+    <h1>个人资料</h1>
+    <div class="pf-hero">
+      <div class="ava ph-1" style="border-radius:50%"></div>
+      <div>
+        <div style="font-size:17px;font-weight:700">子非余</div>
+        <div class="tiny" style="margin-top:6px">已观看 128 个视频 · 关注 36 位创作者</div>
+      </div>
+      <button class="btn btn-ghost" style="height:40px;padding:0 20px;margin-left:auto" onclick="toast('头像上传（演示）')">更换头像</button>
+    </div>
+
+    <form class="pf-form" onsubmit="event.preventDefault();toast('资料已保存')">
+      <div class="row">
+        <label>昵称</label>
+        <input type="text" value="子非余">
+      </div>
+      <div class="row">
+        <label>邮箱</label>
+        <input type="email" value="hello@novastream.demo">
+      </div>
+      <div class="row">
+        <label>简介</label>
+        <textarea>喜欢城市夜景和慢节奏的旅行记录。</textarea>
+      </div>
+      <div class="row">
+        <label>所在地区</label>
+        <select><option>中国大陆</option><option>港澳台</option><option>海外</option></select>
+      </div>
+      <button class="btn btn-primary" type="submit">保存修改</button>
+    </form>
+  </section>
+
+  <section class="pc-panel" id="works" data-pane style="display:none">
+    <div class="mw-head">
+      <h1>我的作品</h1>
+      <div class="acts">
+        <button class="btn btn-ghost" onclick="toast('数据统计面板（演示）')">数据概览</button>
+        <a class="btn btn-primary" href="upload.html">＋ 上传新作品</a>
+      </div>
+    </div>
+
+    <div class="mw-stats">
+      <div class="mw-stat"><div class="n">1,284<em>次</em></div><div class="k">总播放</div></div>
+      <div class="mw-stat"><div class="n">96<em>条</em></div><div class="k">总留言</div></div>
+      <div class="mw-stat"><div class="n">2.4<em>%</em></div><div class="k">完播率</div></div>
+      <div class="mw-stat"><div class="n">36<em>位</em></div><div class="k">新增粉丝</div></div>
+    </div>
+
+    <div class="mw-tabs" id="mwTabs">
+      <button class="on" data-tab="all">全部<span class="cnt">6</span></button>
+      <button data-tab="pub">已发布<span class="cnt">3</span></button>
+      <button data-tab="rev">审核中<span class="cnt">1</span></button>
+      <button data-tab="dft">草稿<span class="cnt">1</span></button>
+      <button data-tab="rej">未通过<span class="cnt">1</span></button>
+    </div>
+
+    <div class="mw-list" id="mwList"></div>
+  </section>
+</div>
+
+<div id="toast" style="position:fixed;left:50%;bottom:40px;translate:-50% 0;padding:11px 20px;border-radius:999px;background:rgba(24,30,42,.88);color:#fff;font-size:13px;opacity:0;transition:.26s;pointer-events:none;z-index:99"></div>
+
+<script>
+  let tt;
+  function toast(msg){
+    const el = document.getElementById("toast");
+    el.textContent = msg; el.style.opacity = 1;
+    clearTimeout(tt); tt = setTimeout(()=>el.style.opacity = 0, 1700);
+  }
+</script>
+
+<script>
+const MY_WORKS = [
+  { id:"w1", title:"凌晨三点的城市高架，像一条发光的河", st:"pub", stText:"已发布",
+    dur:"08:12", cat:"旅行", date:"2 天前", play:842, cm:61, note:"" },
+  { id:"w2", title:"把一张白纸做成杂志封面｜排版思路拆解", st:"pub", stText:"已发布",
+    dur:"12:46", cat:"知识", date:"5 天前", play:336, cm:24, note:"" },
+  { id:"w3", title:"三个配色原则，让你的作业不再是黑白灰", st:"pub", stText:"已发布",
+    dur:"06:33", cat:"知识", date:"上周", play:106, cm:11, note:"" },
+  { id:"w4", title:"摸鱼日常：我在工位上养了一缸鱼", st:"rev", stText:"审核中",
+    dur:"04:07", cat:"生活", date:"刚刚", play:0, cm:0, note:"预计 30 分钟内完成审核" },
+  { id:"w5", title:"没有标题的作品", st:"dft", stText:"草稿",
+    dur:"—", cat:"未选择分区", date:"3 天前编辑", play:0, cm:0, note:"封面和视频文件还没补齐" },
+  { id:"w6", title:"搬运自某平台的城市夜景合集", st:"rej", stText:"未通过",
+    dur:"21:05", cat:"旅行", date:"1 周前", play:0, cm:0, note:"因版权归属不明确未通过，可修改后重新提交" }
+];
+
+let curTab = "all";
+
+function renderWorks(){
+  const list = document.getElementById("mwList");
+  const rows = MY_WORKS.filter(w => curTab === "all" || w.st === curTab);
+  if (!rows.length){
+    list.innerHTML = '<div class="mw-empty"><div class="ic">🐟</div>这里还空着</div>';
+    return;
+  }
+  list.innerHTML = rows.map(w => {
+    let acts = "";
+    if (w.st === "pub") acts = `<button>数据</button><button>编辑</button><button onclick="toast('已下架为草稿')">下架</button><button class="go" onclick="location.href='watch.html'">查看</button>`;
+    if (w.st === "rev") acts = `<button class="go" onclick="toast('正在审核，先等等')">看进度</button><button onclick="toast('已撤回为草稿')">撤回</button>`;
+    if (w.st === "dft") acts = `<button class="go" onclick="location.href='upload.html'">继续编辑</button><button onclick="toast('草稿已删除')">删除</button>`;
+    if (w.st === "rej") acts = `<button class="go" onclick="toast('修改后可重新提交')">修改重提</button><button onclick="toast('申诉已提交')">申诉</button>`;
+    const meta = w.st === "dft"
+      ? `<span>${w.cat}</span><span>${w.date}</span>`
+      : `<span>播放 <b>${w.play}</b></span><span>留言 <b>${w.cm}</b></span><span>分区 ${w.cat}</span><span>${w.date}</span>`;
+    return `
+      <div class="mw-item">
+        <div class="mw-thumb">
+          <span class="st ${w.st}">${w.stText}</span>
+          ${w.dur !== "—" ? `<span class="dur">${w.dur}</span>` : ""}
+        </div>
+        <div class="mw-main">
+          <div class="mw-title">${w.title}</div>
+          <div class="mw-meta">${meta}</div>
+          ${w.note ? `<div class="mw-note">${w.note}</div>` : ""}
+        </div>
+        <div class="mw-acts">${acts}</div>
+      </div>`;
+  }).join("");
+}
+
+document.getElementById("mwTabs").addEventListener("click", e => {
+  const b = e.target.closest("button");
+  if (!b) return;
+  document.querySelectorAll("#mwTabs button").forEach(x => x.classList.remove("on"));
+  b.classList.add("on");
+  curTab = b.dataset.tab;
+  renderWorks();
+});
+renderWorks();
+
+document.querySelectorAll("[data-pane-link]").forEach(a => {
+  a.addEventListener("click", e => {
+    e.preventDefault();
+    const key = a.dataset.paneLink;
+    document.querySelectorAll("[data-pane-link]").forEach(x => x.classList.remove("on"));
+    a.classList.add("on");
+    document.querySelectorAll("[data-pane]").forEach(pane => {
+      pane.style.display = pane.id === key ? "" : "none";
+    });
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  });
+});
+
+if (location.hash === "#works"){
+  document.querySelector('[data-pane-link="works"]').click();
+}
+</script>
+<script src="js/notify.js"></script>
+<script>
+  // 侧栏点「通知」，把顶栏的铃铛点开
+  document.getElementById("notiEntry").addEventListener("click", e => {
+    e.preventDefault();
+    const b = document.querySelector(".noti-btn") || (() => {
+      const nb = document.createElement("button");
+      nb.className = "icon-btn";
+      nb.title = "消息";
+      nb.style.position = "fixed";
+      nb.style.right = "26px";
+      nb.style.top = "22px";
+      nb.style.zIndex = 30;
+      document.body.appendChild(nb);
+      return nb;
+    })();
+    if (!b.classList.contains("noti-btn") && window.nsInitNoti) window.nsInitNoti();
+    setTimeout(() => {
+      const t = document.querySelector(".noti-btn") || b;
+      t.click();
+    }, 30);
+  });
+</script>
+</body>
+</html>

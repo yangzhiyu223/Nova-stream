@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Stream · 消息</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/extra.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html"><span class="mark">N</span>Nova Stream</a>
+  <form class="search" onsubmit="event.preventDefault();location.href='search.html'">
+    <span>🔍</span><input type="text" placeholder="搜索创作者">
+  </form>
+  <nav class="topnav">
+    <a href="index.html">首页</a>
+    <a href="categories.html">分类</a>
+    <a href="creators.html" class="active">创作者</a>
+    <a href="friends.html">好友</a>
+    <a href="upload.html">创作中心</a>
+    <a href="profile.html">我的</a>
+  </nav>
+  <a href="profile.html"><img class="avatar ph-3" alt="头像"></a>
+</header>
+
+<div class="feed-wrap">
+  <a class="feed-back" href="profile.html">← 返回我的</a>
+  <div class="feed-head">
+    <h1>消息</h1>
+    <p>系统和创作者发给你的提醒</p>
+  </div>
+  <div class="feed-list">
+    <article class="feed-card">
+      <div class="ava ph-0"></div>
+      <div class="feed-body">
+        <p><b>Nova Stream</b> 你订阅的 3 位创作者本周有更新，去看看</p>
+        <span class="time">昨天</span>
+        <div class="feed-acts"><a href="feed.html">打开动态</a></div>
+      </div>
+    </article>
+    <article class="feed-card">
+      <div class="ava ph-1"></div>
+      <div class="feed-body">
+        <p><b>Maya Chen</b> 发布了新视频《把一张白纸做成杂志封面》</p>
+        <span class="time">10 分钟前</span>
+        <div class="feed-acts"><a href="watch.html">去播放</a></div>
+      </div>
+    </article>
+    <article class="feed-card">
+      <div class="ava ph-6"></div>
+      <div class="feed-body">
+        <p><b>Kai Tanaka</b> 回复了你的评论</p>
+        <span class="time">1 小时前</span>
+        <div class="feed-acts"><a href="feed.html">查看动态</a></div>
+      </div>
+    </article>
+  </div>
+</div>
+
+<script src="js/data.js"></script>
+<script src="js/notify.js"></script>
+</body>
+</html>

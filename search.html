@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Stream · 搜索</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/extra.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html"><span class="mark">N</span>Nova Stream</a>
+  <nav class="topnav" style="margin-left:auto">
+    <a href="index.html">首页</a>
+    <a href="categories.html">分类</a>
+    <a href="creators.html">创作者</a>
+    <a href="friends.html">好友</a>
+    <a href="upload.html">创作中心</a>
+    <a href="profile.html">我的</a>
+  </nav>
+  <a href="profile.html"><img class="avatar ph-2" alt="头像"></a>
+</header></header>
+
+<div class="suggest-wrap">
+  <div class="search-big" id="bar">
+    <span style="color:#98a1ad">🔍</span>
+    <input type="text" id="q" placeholder="搜索视频、创作者、分类" autocomplete="off">
+    <button class="btn btn-primary" id="go" style="height:40px;padding:0 22px">搜索</button>
+  </div>
+  <div class="suggest" id="sg"></div>
+</div>
+
+<div class="search-body">
+  <div class="res-head">
+    <div id="resTitle" class="res-title">搜索试试</div>
+    <div class="chips" id="chips"></div>
+  </div>
+  <div id="results"></div>
+</div>
+
+<script src="js/data.js"></script>
+<script>
+  const q = document.getElementById("q");
+  const sg = document.getElementById("sg");
+  const bar = document.getElementById("bar");
+  const results = document.getElementById("results");
+  const resTitle = document.getElementById("resTitle");
+  const chips = document.getElementById("chips");
+
+  const HISTORY_KEY = "ns_history";
+  function getHist(){
+    try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || "[]"); } catch(e){ return []; }
+  }
+  function addHist(t){
+    let h = getHist().filter(x => x !== t);
+    h.unshift(t);
+    h = h.slice(0, 6);
+    localStorage.setItem(HISTORY_KEY, JSON.stringify(h));
+  }
+  function clearHist(){
+    localStorage.removeItem(HISTORY_KEY);
+    sg.innerHTML = sugEmpty();
+  }
+
+  /* ---- 搜索联想 ---- */
+  const HOT = ["游戏装备推荐", "热门音乐现场", "极简桌面", "高分电影解说", "白噪音"];
+  const SUG_ICON = { video:"▶", creator:"👤", cat:"🏷", hot:"🔥", hist:"🕘" };
+
+  let activeIdx = -1;
+  function sugList(){
+    return [...sg.querySelectorAll("button[data-val]")];
+  }
+  function moveActive(d){
+    const list = sugList(); if (!list.length) return;
+    activeIdx = (activeIdx + d + list.length) % list.length;
+    list.forEach((b,i) => b.classList.toggle("active", i === activeIdx));
+    q.value = list[activeIdx].dataset.val;
+  }
+  function sugEmpty(){
+    return `<div class="sg-empty">还没有搜索记录，搜点什么吧</div>`;
+  }
+  function renderSuggest(){
+    const v = q.value.trim();
+    let html = "";
+    if (!v){
+      const h = getHist();
+      if (h.length){
+        html += `<div class="sg-label">搜索历史<button class="sg-clear" onclick="clearHist()">清空</button></div>`;
+        html += h.map(t => `<button data-val="${t}" onclick="pick('${t}')"><span class="ico">${SUG_ICON.hist}</span>${t}</button>`).join("");
+      }
+      html += `<div class="sg-label">大家都在搜</div>`;
+      html += HOT.map((t,i) => `<button class="${i===0?'active':''}" data-val="${t}" onclick="pick('${t}')"><span class="ico">${SUG_ICON.hot}</span>${t}</button>`).join("");
+    } else {
+      const low = v.toLowerCase();
+      const vs = VIDEOS.filter(x => x.t.toLowerCase().includes(low)).slice(0,4);
+      const cs = CREATORS.filter(x => x.n.toLowerCase().includes(low)).slice(0,3);
+      const ks = CATS.filter(x => x.includes(v) && x !== "全部").slice(0,3);
+      if (!vs.length && !cs.length && !ks.length){
+        html = `<div class="sg-empty">没有直接匹配，回车搜「${v}」看看全部</div>`;
+      } else {
+        html += vs.map(x => `<button data-val="${x.t}" onclick="pick('${x.t.replace(/'/g,"\\'")}')"><span class="ico">${SUG_ICON.video}</span>${x.t}<span class="sg-tag">视频</span></button>`).join("");
+        html += cs.map(x => `<button data-val="${x.n}" onclick="pick('${x.n.replace(/'/g,"\\'")}')"><span class="ico">${SUG_ICON.creator}</span>${x.n}<span class="sg-tag">创作者</span></button>`).join("");
+        html += ks.map(x => `<button data-val="${x}" onclick="pick('${x}')"><span class="ico">${SUG_ICON.cat}</span>${x}<span class="sg-tag">分类</span></button>`).join("");
+      }
+    }
+    sg.innerHTML = html;
+    activeIdx = -1;
+  }
+  function showSg(){ renderSuggest(); sg.classList.add("show"); }
+  function hideSg(){ sg.classList.remove("show"); activeIdx = -1; }
+
+  q.addEventListener("focus", showSg);
+  q.addEventListener("input", showSg);
+  q.addEventListener("keydown", e => {
+    if (e.key === "ArrowDown"){ e.preventDefault(); showSg(); moveActive(1); }
+    else if (e.key === "ArrowUp"){ e.preventDefault(); moveActive(-1); }
+    else if (e.key === "Enter"){ e.preventDefault(); doSearch(q.value.trim()); }
+    else if (e.key === "Escape"){ hideSg(); q.blur(); }
+  });
+  document.addEventListener("click", e => { if (!e.target.closest(".suggest-wrap")) hideSg(); });
+
+  function pick(t){ q.value = t; hideSg(); showAll(t); }
+
+  /* ---- 结果区 ---- */
+  const CATS_UI = ["全部","视频","创作者"];
+  let nowType = "全部";
+  let nowKey = "";
+
+  function renderChips(){
+    chips.innerHTML = CATS_UI.map(c =>
+      `<button class="chip ${c === nowType ? "active" : ""}" data-t="${c}">${c}</button>`).join("");
+  }
+  chips.addEventListener("click", e => {
+    const b = e.target.closest(".chip"); if (!b) return;
+    nowType = b.dataset.t;
+    renderChips();
+    render();
+  });
+
+  function videoRow(v){
+    return `
+    <a href="watch.html?t=${encodeURIComponent(v.t)}&u=${encodeURIComponent(v.c)}" class="res-row">
+      <div class="ph-${v.ph} res-thumb"></div>
+      <div class="res-main">
+        <h3>${v.t}</h3>
+        <p>${v.t} · 这段简介是占位文本，用来演示两行截断。内容与视频无关。</p>
+        <div class="res-meta">
+          <a href="creator.html?u=${encodeURIComponent(v.c)}&from=search" class="ph-${v.ph} res-ava"></a>
+          <a href="creator.html?u=${encodeURIComponent(v.c)}&from=search">${v.c}</a>
+          <span>·</span><span>${v.v} 次播放</span><span>·</span><span>${v.d}</span>
+        </div>
+      </div>
+    </a>`;
+  }
+
+  function creatorRow(c){
+    const on = isSub(c.n);
+    return `
+    <div class="res-row res-user">
+      <a href="creator.html?u=${encodeURIComponent(c.n)}&from=search" class="ph-${c.ph} res-ava-big"></a>
+      <div class="res-main">
+        <h3><a href="creator.html?u=${encodeURIComponent(c.n)}&from=search">${c.n}</a></h3>
+        <p>${c.d} · ${c.f} 粉丝</p>
+        <div class="res-acts">
+          <button class="btn ${on?"btn-ghost":"btn-primary"} res-sub sub-btn" data-n="${c.n}">${on?"已订阅 ✓":"订阅"}</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function render(){
+    const low = nowKey.toLowerCase();
+    const vs = !nowKey ? VIDEOS : VIDEOS.filter(v =>
+      v.t.toLowerCase().includes(low) || v.c.toLowerCase().includes(low));
+    const cs = !nowKey ? [] : CREATORS.filter(c =>
+      c.n.toLowerCase().includes(low) || c.d.toLowerCase().includes(low));
+
+    let html = "";
+    if (nowType === "全部" || nowType === "视频"){
+      if (vs.length) html += (nowType === "全部" && cs.length ? `<div class="res-label">视频</div>` : "") + vs.map(videoRow).join("");
+    }
+    if (nowType === "全部" || nowType === "创作者"){
+      if (cs.length) html += (nowType === "全部" && vs.length ? `<div class="res-label">创作者</div>` : "") + cs.map(creatorRow).join("");
+    }
+    if (!html){
+      html = `<div class="empty">
+        <div class="eico">🫧</div>
+        <h3>没搜到「${nowKey || "空"}」</h3>
+        <p>换个词试试，或者看看大家都在搜</p>
+        <button class="btn btn-primary" onclick="q.value='';showAll('')">看看推荐</button>
+      </div>`;
+    }
+    results.innerHTML = html;
+  }
+
+  results.addEventListener("click", e => {
+    const b = e.target.closest(".sub-btn");
+    if (!b) return;
+    e.preventDefault();
+    e.stopPropagation();
+    const name = b.dataset.n;
+    const on = toggleSub(name);
+    b.className = `btn ${on ? "btn-ghost" : "btn-primary"} res-sub sub-btn`;
+    b.textContent = on ? "已订阅 ✓" : "订阅";
+  });
+
+  function showAll(key){
+    nowKey = key || "";
+    nowType = "全部";
+    renderChips();
+    if (!nowKey){
+      resTitle.textContent = "大家都在看";
+      history.replaceState(null, "", "search.html");
+    } else {
+      addHist(nowKey);
+      resTitle.innerHTML = `「<b>${nowKey}</b>」的搜索结果`;
+      history.replaceState(null, "", "search.html?q=" + encodeURIComponent(nowKey));
+    }
+    render();
+  }
+
+  function doSearch(k){
+    hideSg();
+    if (k) { bar.classList.add("done"); }
+    showAll(k);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  }
+  document.getElementById("go").addEventListener("click", () => doSearch(q.value.trim()));
+
+  const init = new URLSearchParams(location.search).get("q");
+  if (init){ q.value = init; showAll(init); } else { showAll(""); }
+</script>
+<script src="js/notify.js"></script>
+</body>
+</html>

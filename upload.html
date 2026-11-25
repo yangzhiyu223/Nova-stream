@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Nova Stream · 创作中心</title>
+<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/extra.css">
+<link rel="stylesheet" href="css/upload.css">
+</head>
+<body>
+
+<header class="topbar">
+  <a class="logo" href="index.html"><span class="mark">N</span>Nova Stream</a>
+  <form class="search" onsubmit="event.preventDefault();location.href='search.html'">
+    <span>🔍</span>
+    <input type="text" placeholder="搜索视频、创作者、分类">
+  </form>
+  <nav class="topnav">
+    <a href="index.html" data-page="index.html">首页</a>
+    <a href="categories.html" data-page="categories.html">分类</a>
+    <a href="creators.html" data-page="creators.html">创作者</a>
+    <a href="friends.html" data-page="friends.html">好友</a>
+    <a href="upload.html" data-page="upload.html" class="active">创作中心</a>
+    <a href="profile.html" data-page="profile.html">我的</a>
+  </nav>
+  <button class="icon-btn" title="消息">🔔</button>
+  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+</header>
+
+<div class="up-wrap">
+
+  <div class="up-head">
+    <div>
+      <div class="crumbs"><a href="profile.html#works" style="color:inherit">← 返回我的作品</a> · 创作中心 / <b>上传新作品</b></div>
+      <h1>上传作品</h1>
+      <p>把你想说的东西放上来，剩下的我们帮你分发</p>
+    </div>
+    <div class="up-steps" id="steps">
+      <span class="on"><i>1</i>填写信息</span>
+      <span class="bar"></span>
+      <span><i>2</i>上传文件</span>
+      <span class="bar"></span>
+      <span><i>3</i>等待审核</span>
+    </div>
+  </div>
+
+  <div class="up-layout">
+    <div class="up-main">
+
+      <!-- 封面 -->
+      <section class="panel">
+        <div class="panel-head">
+          <h2>封面</h2>
+          <span>16:9 · 建议 1280×720 以上</span>
+        </div>
+        <div class="cover-row">
+          <div class="cover-drop" id="coverDrop">
+            <div class="ic">🖼</div>
+            <div>点击或拖入封面图</div>
+            <div style="font-size:11px;color:#b9c0ca">JPG / PNG，不超过 5MB</div>
+            <div class="label" style="display:none">重新选择</div>
+          </div>
+          <div class="cover-side">
+            <div class="hint">
+              没有现成的图？从下面挑一张自动生成的风格封面，
+              或者点「截取当前帧」用视频第一帧。
+            </div>
+            <div class="cover-thumbs" id="thumbs">
+              <button style="background:linear-gradient(120deg,#d9f2ee,#ffe4cf)"></button>
+              <button style="background:linear-gradient(120deg,#ffe0c7,#f7c9a4)"></button>
+              <button style="background:linear-gradient(120deg,#d7e5f7,#d9f2ee)"></button>
+              <button style="background:linear-gradient(120deg,#f2e2f7,#ffe4cf)"></button>
+            </div>
+            <div style="display:flex;gap:10px;margin-top:auto">
+              <button class="btn btn-ghost" style="height:40px;padding:0 18px;font-size:13px" onclick="grabFrame()">截取当前帧</button>
+              <button class="btn btn-ghost" style="height:40px;padding:0 18px;font-size:13px" onclick="toast('已套用推荐封面')">用推荐封面</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 基本信息 -->
+      <section class="panel">
+        <div class="panel-head">
+          <h2>基本信息</h2>
+          <span id="saveState">草稿已保存</span>
+        </div>
+
+        <div class="field">
+          <label>标题<em>*</em><span class="counter" id="titleCount">0 / 40</span></label>
+          <input class="control" id="title" maxlength="40" placeholder="一句话说清楚这个视频讲什么">
+        </div>
+
+        <div class="field">
+          <label>简介<span class="counter" id="descCount">0 / 200</span></label>
+          <textarea class="control" id="desc" maxlength="200" placeholder="补充背景、亮点或时间线，让别人更愿意点开"></textarea>
+        </div>
+
+        <div class="two-col">
+          <div class="field">
+            <label>分区<em>*</em></label>
+            <div class="select-wrap">
+              <select class="control" id="cat"></select>
+            </div>
+          </div>
+          <div class="field">
+            <label>合集</label>
+            <div class="select-wrap">
+              <select class="control" id="series">
+                <option value="">不加入合集</option>
+                <option>三分钟讲完一个设计原则</option>
+                <option>我的摸鱼日常</option>
+                <option>网页作业翻车实录</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <div class="field" style="margin-bottom:0">
+          <label>标签<span class="counter">最多 6 个</span></label>
+          <div class="tag-box" id="tagBox">
+            <input id="tagInput" placeholder="输入后按回车添加">
+          </div>
+          <div class="tag-suggest" id="tagSuggest"></div>
+        </div>
+      </section>
+
+      <!-- 视频文件 -->
+      <section class="panel">
+        <div class="panel-head">
+          <h2>视频文件</h2>
+          <span id="fileState">尚未上传</span>
+        </div>
+
+        <div class="drop-zone" id="dropZone">
+          <div class="ic">🎬</div>
+          <h3>把视频拖到这里，或点击选择</h3>
+          <p>支持 MP4 / MOV / MKV，单个文件不超过 4GB</p>
+          <div class="fmt">上传后可继续编辑信息，审核通常在 30 分钟内完成</div>
+        </div>
+
+        <div id="fileItem" class="file-item" style="display:none;margin-top:14px">
+          <div class="thumb"></div>
+          <div class="info">
+            <div class="name" id="fileName">—</div>
+            <div class="meta" id="fileMeta">—</div>
+            <div class="track-line"><div id="fileBar"></div></div>
+          </div>
+          <div class="pct" id="filePct">0%</div>
+          <button class="del" title="移除">✕</button>
+        </div>
+
+        <button class="btn btn-ghost" id="pickBtn" style="margin-top:14px;height:42px;font-size:13.5px" onclick="document.getElementById('videoInput').click()">
+          ⬆ 选择本地文件
+        </button>
+        <input type="file" id="videoInput" accept="video/*" hidden>
+      </section>
+
+    </div>
+
+    <!-- 侧栏 -->
+    <aside class="up-side">
+
+      <section class="panel">
+        <div class="panel-head"><h2>作品预览</h2></div>
+        <div class="art-preview" id="artPreview">封面预览</div>
+        <div class="preview-title" id="pvTitle">还没填标题</div>
+        <div class="preview-sub" id="pvSub">子非余 · 刚刚</div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>谁可以看到</h2></div>
+        <div class="vis-list" id="visList">
+          <label class="on">
+            <input type="radio" name="vis" checked>
+            <div><div class="t">公开</div><div class="d">所有人可见，会出现在推荐和搜索里</div></div>
+          </label>
+          <label>
+            <input type="radio" name="vis">
+            <div><div class="t">仅粉丝</div><div class="d">只有关注你的人能看到这条</div></div>
+          </label>
+          <label>
+            <input type="radio" name="vis">
+            <div><div class="t">链接可见</div><div class="d">不公开，拿到链接的人才能看</div></div>
+          </label>
+          <label>
+            <input type="radio" name="vis">
+            <div><div class="t">仅自己</div><div class="d">当草稿用，随时可以改成公开</div></div>
+          </label>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head"><h2>发布选项</h2></div>
+        <div class="switch-row">
+          <div><div class="t">允许留言</div><div class="d">关掉后这条不接受新留言</div></div>
+          <button class="switch on" data-switch></button>
+        </div>
+        <div class="switch-row">
+          <div><div class="t">允许下载</div><div class="d">观众可以保存视频文件</div></div>
+          <button class="switch" data-switch></button>
+        </div>
+        <div class="switch-row">
+          <div><div class="t">定时发布</div><div class="d">审核通过后按设定时间上线</div></div>
+          <button class="switch" data-switch></button>
+        </div>
+        <div class="up-tip" style="margin-top:14px">
+          <span>💡</span>
+          <div>原创作品会获得额外推荐权重，搬运请注明出处。</div>
+        </div>
+      </section>
+
+    </aside>
+  </div>
+
+  <div class="up-bar">
+    <span class="save-hint" id="barHint">所有改动已自动保存</span>
+    <button class="btn btn-ghost" onclick="toast('草稿已保存')">存草稿</button>
+    <button class="btn btn-teal" onclick="toast('预览已在新窗口打开')">预览</button>
+    <button class="btn btn-primary" onclick="publish()">发布作品</button>
+  </div>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="js/data.js"></script>
+<script>
+const $ = id => document.getElementById(id);
+const toastEl = $("toast");
+let toastTimer;
+function toast(msg){
+  toastEl.textContent = msg;
+  toastEl.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>toastEl.classList.remove("show"), 1800);
+}
+
+/* 分区下拉 */
+const catSel = $("cat");
+catSel.innerHTML = CATS.filter(c => c !== "全部")
+  .map(c => `<option>${c}</option>`).join("");
+
+/* 字数统计 */
+function bindCount(input, counter, max){
+  const upd = () => {
+    const n = input.value.length;
+    counter.textContent = `${n} / ${max}`;
+    counter.classList.toggle("warn", n > max * 0.9);
+    syncPreview();
+  };
+  input.addEventListener("input", upd);
+  upd();
+}
+function syncPreview(){
+  const t = $("title").value.trim();
+  $("pvTitle").textContent = t || "还没填标题";
+  $("pvSub").textContent = "子非余 · 刚刚" + (catSel.value ? " · " + catSel.value : "");
+}
+
+/* 标签 */
+const tags = ["设计", "网页"];
+const tagBox = $("tagBox"), tagInput = $("tagInput");
+const suggestPool = ["教程", "经验分享", "摸鱼", "踩坑", "作业", "剪辑", "排版", "配色", "动画"];
+function renderTags(){
+  tagBox.querySelectorAll(".tag").forEach(n => n.remove());
+  tags.forEach((t, i) => {
+    const el = document.createElement("span");
+    el.className = "tag";
+    el.innerHTML = `${t}<b data-i="${i}">✕</b>`;
+    tagBox.insertBefore(el, tagInput);
+  });
+  tagBox.querySelectorAll(".tag b").forEach(b => {
+    b.onclick = () => { tags.splice(+b.dataset.i, 1); renderTags(); renderSuggest(); };
+  });
+}
+function addTag(t){
+  t = t.trim().replace(/^#/, "");
+  if (!t) return;
+  if (tags.includes(t)) return toast("这个标签已经加过了");
+  if (tags.length >= 6) return toast("最多 6 个标签");
+  tags.push(t);
+  renderTags(); renderSuggest(); syncPreview();
+}
+function renderSuggest(){
+  const left = suggestPool.filter(t => !tags.includes(t));
+  $("tagSuggest").innerHTML = left.map(t => `<button data-t="${t}">+ ${t}</button>`).join("");
+  $("tagSuggest").querySelectorAll("button").forEach(b => {
+    b.onclick = () => addTag(b.dataset.t);
+  });
+}
+tagInput.addEventListener("keydown", e => {
+  if (e.key === "Enter" || e.key === ",") { e.preventDefault(); addTag(tagInput.value); tagInput.value = ""; }
+  if (e.key === "Backspace" && !tagInput.value && tags.length) { tags.pop(); renderTags(); renderSuggest(); }
+});
+renderTags(); renderSuggest();
+
+/* 封面 */
+const coverDrop = $("coverDrop");
+let coverData = "";
+coverDrop.addEventListener("click", () => {
+  const inp = document.createElement("input");
+  inp.type = "file"; inp.accept = "image/*";
+  inp.onchange = () => { if (inp.files[0]) readCover(inp.files[0]); };
+  inp.click();
+});
+["dragenter","dragover"].forEach(ev => coverDrop.addEventListener(ev, e => {
+  e.preventDefault(); coverDrop.style.borderColor = "var(--orange)";
+}));
+coverDrop.addEventListener("dragleave", () => coverDrop.style.borderColor = "");
+coverDrop.addEventListener("drop", e => {
+  e.preventDefault(); coverDrop.style.borderColor = "";
+  const f = e.dataTransfer.files[0];
+  if (f && f.type.startsWith("image/")) readCover(f);
+  else toast("请拖入图片文件");
+});
+function setCover(url){
+  coverData = url;
+  coverDrop.classList.add("has");
+  coverDrop.style.backgroundImage = `url(${url})`;
+  coverDrop.querySelector(".ic").style.display = "none";
+  coverDrop.querySelectorAll("div:not(.label)").forEach(d => d.style.display = "none");
+  coverDrop.querySelector(".label").style.display = "inline-block";
+  $("artPreview").style.backgroundImage = `url(${url})`;
+  $("artPreview").textContent = "";
+}
+function readCover(file){
+  const r = new FileReader();
+  r.onload = () => setCover(r.result);
+  r.readAsDataURL(file);
+}
+$("thumbs").querySelectorAll("button").forEach(b => {
+  b.onclick = () => {
+    $("thumbs").querySelectorAll("button").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    const g = getComputedStyle(b).backgroundImage;
+    coverDrop.classList.add("has");
+    coverDrop.style.background = g;
+    $("artPreview").style.background = g;
+    $("artPreview").textContent = "";
+    toast("封面已套用，可随时换掉");
+  };
+});
+function grabFrame(){
+  if (!$("fileItem").offsetParent) { toast("先上传视频再截帧"); return; }
+  setCover("data:image/svg+xml;utf8," + encodeURIComponent(
+    `<svg xmlns='http://www.w3.org/2000/svg' width='320' height='180'>
+      <defs><linearGradient id='g' x1='0' y1='0' x2='1' y2='1'>
+      <stop offset='0' stop-color='#8fdcd2'/><stop offset='1' stop-color='#ffc79b'/>
+      </linearGradient></defs><rect width='320' height='180' fill='url(#g)'/></svg>`
+  ));
+  toast("已从视频截取第一帧");
+}
+
+/* 视频上传 */
+const dropZone = $("dropZone"), videoInput = $("videoInput");
+dropZone.onclick = () => videoInput.click();
+["dragenter","dragover"].forEach(ev => dropZone.addEventListener(ev, e => {
+  e.preventDefault(); dropZone.classList.add("over");
+}));
+dropZone.addEventListener("dragleave", () => dropZone.classList.remove("over"));
+dropZone.addEventListener("drop", e => {
+  e.preventDefault(); dropZone.classList.remove("over");
+  if (e.dataTransfer.files[0]) startUpload(e.dataTransfer.files[0]);
+});
+videoInput.onchange = () => { if (videoInput.files[0]) startUpload(videoInput.files[0]); };
+
+let upTimer;
+function fmtSize(b){
+  if (b > 1024 ** 3) return (b / 1024 ** 3).toFixed(2) + " GB";
+  if (b > 1024 ** 2) return (b / 1024 ** 2).toFixed(1) + " MB";
+  return Math.max(1, Math.round(b / 1024)) + " KB";
+}
+function startUpload(file){
+  if (!file.type.startsWith("video/")) return toast("请选择视频文件");
+  clearInterval(upTimer);
+  $("fileName").textContent = file.name;
+  $("fileMeta").textContent = fmtSize(file.size) + " · 正在上传";
+  $("fileItem").style.display = "flex";
+  dropZone.style.display = "none";
+  $("fileState").textContent = "上传中";
+  $("fileState").style.color = "var(--teal-deep)";
+  let p = 0;
+  upTimer = setInterval(() => {
+    p = Math.min(100, p + Math.random() * 9);
+    $("fileBar").style.width = p + "%";
+    $("filePct").textContent = Math.round(p) + "%";
+    if (p >= 100) {
+      clearInterval(upTimer);
+      $("fileMeta").textContent = fmtSize(file.size) + " · 上传完成，等待审核";
+      $("fileState").textContent = "已上传";
+      $("fileState").style.color = "var(--ink-3)";
+      toast("视频上传完成");
+    }
+  }, 260);
+}
+$("fileItem").querySelector(".del").onclick = () => {
+  clearInterval(upTimer);
+  $("fileItem").style.display = "none";
+  dropZone.style.display = "block";
+  $("fileBar").style.width = "0";
+  $("filePct").textContent = "0%";
+  $("fileState").textContent = "尚未上传";
+  $("fileState").style.color = "";
+  videoInput.value = "";
+};
+
+/* 开关 */
+document.querySelectorAll("[data-switch]").forEach(sw => {
+  sw.onclick = () => sw.classList.toggle("on");
+});
+
+/* 可见范围 */
+$("visList").querySelectorAll("label").forEach(l => {
+  l.onclick = () => {
+    $("visList").querySelectorAll("label").forEach(x => x.classList.remove("on"));
+    l.classList.add("on");
+  };
+});
+
+/* 自动保存提示 */
+["title","desc","cat","series"].forEach(id => {
+  $(id).addEventListener("input", () => {
+    $("saveState").textContent = "保存中…";
+    clearTimeout(window._sv);
+    window._sv = setTimeout(() => { $("saveState").textContent = "草稿已保存"; }, 700);
+    syncPreview();
+  });
+});
+catSel.addEventListener("change", syncPreview);
+syncPreview();
+
+/* 发布校验 */
+function publish(){
+  if (!$("title").value.trim()) { toast("先给作品起个标题"); $("title").focus(); return; }
+  if (!$("fileItem").offsetParent) { toast("还没上传视频文件"); return; }
+  if ($("filePct").textContent !== "100%") { toast("视频还在上传，等一会儿"); return; }
+  toast("已提交，审核通过后自动上线");
+  const stepEls = document.querySelectorAll("#steps span");
+  stepEls.forEach(el => el.classList.add("on"));
+}
+</script>
+<script src="js/notify.js"></script>
+</body>
+</html>
