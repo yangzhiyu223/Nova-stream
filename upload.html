@@ -6,7 +6,9 @@
 <title>Nova Stream · 创作中心</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
+<link rel="stylesheet" href="css/night.css">
 <link rel="stylesheet" href="css/upload.css">
+<script src="js/hue.js"></script>
 </head>
 <body>
 
@@ -67,10 +69,10 @@
               或者点「截取当前帧」用视频第一帧。
             </div>
             <div class="cover-thumbs" id="thumbs">
-              <button style="background:linear-gradient(120deg,#d9f2ee,#ffe4cf)"></button>
-              <button style="background:linear-gradient(120deg,#ffe0c7,#f7c9a4)"></button>
-              <button style="background:linear-gradient(120deg,#d7e5f7,#d9f2ee)"></button>
-              <button style="background:linear-gradient(120deg,#f2e2f7,#ffe4cf)"></button>
+              <button style="background-image:url(assets/covers/v12.jpg);background-size:cover;background-position:center" data-cover="assets/covers/v12.jpg"></button>
+              <button style="background-image:url(assets/covers/v27.jpg);background-size:cover;background-position:center" data-cover="assets/covers/v27.jpg"></button>
+              <button style="background-image:url(assets/covers/v45.jpg);background-size:cover;background-position:center" data-cover="assets/covers/v45.jpg"></button>
+              <button style="background-image:url(assets/covers/v58.jpg);background-size:cover;background-position:center" data-cover="assets/covers/v58.jpg"></button>
             </div>
             <div style="display:flex;gap:10px;margin-top:auto">
               <button class="btn btn-ghost" style="height:40px;padding:0 18px;font-size:13px" onclick="grabFrame()">截取当前帧</button>
@@ -334,7 +336,8 @@ $("thumbs").querySelectorAll("button").forEach(b => {
   b.onclick = () => {
     $("thumbs").querySelectorAll("button").forEach(x => x.classList.remove("on"));
     b.classList.add("on");
-    const g = getComputedStyle(b).backgroundImage;
+    const path = b.dataset.cover || "";
+    const g = path ? `url(${path})` : getComputedStyle(b).backgroundImage;
     coverDrop.classList.add("has");
     coverDrop.style.background = g;
     $("artPreview").style.background = g;

@@ -6,6 +6,7 @@
 <title>Nova Stream · 首页</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
+<link rel="stylesheet" href="css/night.css">
 </head>
 <body>
 
@@ -49,6 +50,15 @@
   </aside>
 
   <main class="main">
+    <section class="hero">
+      <div class="hero-txt">
+        <p class="hero-kicker">NOVA STREAM · 今日片单</p>
+        <h1>今晚，看点不吵闹的</h1>
+        <p class="hero-sub">24 条为你挑好的片子，避开信息洪流，安静地看一会儿</p>
+        <p class="hero-mood" id="heroMood"></p>
+      </div>
+      <div class="hero-glow"></div>
+    </section>
     <div class="chips" id="chips"></div>
     <div class="grid" id="grid"></div>
   </main>
@@ -154,6 +164,7 @@
   else if (fromUser){ nowCreator = fromUser; buildChips(); render(); }
   else { buildChips(); render(); }
 </script>
+<script src="js/hue.js"></script>
 <script src="js/notify.js"></script>
 <script src="js/notice.js"></script>
 </body>

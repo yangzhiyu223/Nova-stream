@@ -6,6 +6,7 @@
 <title>Nova Stream · 我的</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
+<link rel="stylesheet" href="css/night.css">
 <link rel="stylesheet" href="css/myworks.css">
 <style>
   .pc-wrap{max-width:1040px;margin:0 auto;padding:30px 26px 70px;display:grid;grid-template-columns:230px 1fr;gap:24px}
@@ -41,6 +42,7 @@
   .toggle.on{background:linear-gradient(100deg,#14b8a6,#2ec9ba)}
   .toggle.on::after{left:23px}
 </style>
+<script src="js/hue.js"></script>
 </head>
 <body>
 
@@ -57,22 +59,20 @@
     <a href="upload.html">创作中心</a>
     <a href="profile.html" class="active">我的</a>
   </nav>
-  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+    <button class="icon-btn" title="消息">🔔</button>
+<a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
 </header>
 
 <div class="pc-wrap">
   <aside class="pc-menu">
     <a href="#profile" class="on" data-pane-link="profile">👤 个人资料</a>
     <a href="#works" data-pane-link="works">🎬 我的作品</a>
-    <a href="#" onclick="event.preventDefault();toast('我的收藏')">⭐ 收藏</a>
+    <a href="#favs" data-pane-link="favs">⭐ 收藏</a>
     <a href="settings.html">⚙ 账号设置</a>
-    <a href="#" id="notiEntry">🔔 通知<i class="side-dot"></i></a>
+    <a href="#notis" data-pane-link="notis">🔔 通知<i class="side-dot" id="sideNotiDot"></i></a>
     <a href="feed.html">📣 动态</a>
     <a href="feed.html?type=fans">👥 新粉丝</a>
     <a href="messages.html">✉️ 消息</a>
-    <a href="friends.html">🤝 好友</a>
-    <a href="friends.html?tab=req">📥 好友请求</a>
-    <a href="friends.html?tab=chat">💬 私信</a>
     <a href="login.html">↩ 退出登录</a>
   </aside>
 
@@ -134,6 +134,30 @@
 
     <div class="mw-list" id="mwList"></div>
   </section>
+
+  <section class="pc-panel" id="favs" data-pane style="display:none">
+    <div class="mw-head">
+      <h1>我的收藏</h1>
+      <div class="acts">
+        <span class="tiny" id="favCount"></span>
+      </div>
+    </div>
+    <div class="ns-tabs" id="favTabs">
+      <button class="on" data-tab="video">视频</button>
+      <button data-tab="creator">创作者</button>
+    </div>
+    <div id="favList"></div>
+  </section>
+
+  <section class="pc-panel" id="notis" data-pane style="display:none">
+    <div class="mw-head">
+      <h1>通知</h1>
+      <div class="acts">
+        <button class="btn btn-ghost" id="notiClearAll" type="button">全部标为已读</button>
+      </div>
+    </div>
+    <div class="ns-noti-list" id="notiPageList"></div>
+  </section>
 </div>
 
 <div id="toast" style="position:fixed;left:50%;bottom:40px;translate:-50% 0;padding:11px 20px;border-radius:999px;background:rgba(24,30,42,.88);color:#fff;font-size:13px;opacity:0;transition:.26s;pointer-events:none;z-index:99"></div>
@@ -172,7 +196,7 @@ function renderWorks(){
     list.innerHTML = '<div class="mw-empty"><div class="ic">🐟</div>这里还空着</div>';
     return;
   }
-  list.innerHTML = rows.map(w => {
+  list.innerHTML = rows.map((w, idx) => {
     let acts = "";
     if (w.st === "pub") acts = `<button>数据</button><button>编辑</button><button onclick="toast('已下架为草稿')">下架</button><button class="go" onclick="location.href='watch.html'">查看</button>`;
     if (w.st === "rev") acts = `<button class="go" onclick="toast('正在审核，先等等')">看进度</button><button onclick="toast('已撤回为草稿')">撤回</button>`;
@@ -184,7 +208,7 @@ function renderWorks(){
     return `
       <div class="mw-item">
         <div class="mw-thumb">
-          <span class="st ${w.st}">${w.stText}</span>
+          <img src="assets/covers/v${(idx % 64) + 1}.jpg" alt="${w.title}" onerror="this.style.visibility='hidden'">          <span class="st ${w.st}">${w.stText}</span>
           ${w.dur !== "—" ? `<span class="dur">${w.dur}</span>` : ""}
         </div>
         <div class="mw-main">
@@ -224,28 +248,153 @@ if (location.hash === "#works"){
   document.querySelector('[data-pane-link="works"]').click();
 }
 </script>
+<script src="js/data.js"></script>
 <script src="js/notify.js"></script>
 <script>
-  // 侧栏点「通知」，把顶栏的铃铛点开
-  document.getElementById("notiEntry").addEventListener("click", e => {
-    e.preventDefault();
-    const b = document.querySelector(".noti-btn") || (() => {
-      const nb = document.createElement("button");
-      nb.className = "icon-btn";
-      nb.title = "消息";
-      nb.style.position = "fixed";
-      nb.style.right = "26px";
-      nb.style.top = "22px";
-      nb.style.zIndex = 30;
-      document.body.appendChild(nb);
-      return nb;
+  /* ---------- 收藏 / 通知 两个面板 ---------- */
+  (function () {
+    const FAV_KEY = "ns_favs";
+    function getFavs() {
+      let v = null;
+      try { v = JSON.parse(localStorage.getItem(FAV_KEY)); } catch (e) {}
+      if (!v || typeof v !== "object") {
+        // 第一次进来给几条示例收藏
+        v = {
+          video: ["城市夜景延时 · 上海天际线", "山海之间的公路旅行", "下雨天的一杯热可可"],
+          creator: ["Maya Chen", "Lila Travels", "Music Vibes"]
+        };
+        localStorage.setItem(FAV_KEY, JSON.stringify(v));
+      }
+      if (!Array.isArray(v.video)) v.video = [];
+      if (!Array.isArray(v.creator)) v.creator = [];
+      return v;
+    }
+    function setFavs(v) { localStorage.setItem(FAV_KEY, JSON.stringify(v)); }
+    window.nsGetFavs = getFavs;
+    window.nsSetFavs = setFavs;
+
+    (function loadThumbs() {
+      const has = [...document.querySelectorAll("script[src]")].some(s => /js\/data\.js$/.test(s.src));
+      if (has || typeof VIDEOS !== "undefined") return;
+      const s = document.createElement("script");
+      s.src = "js/data.js";
+      document.head.appendChild(s);
     })();
-    if (!b.classList.contains("noti-btn") && window.nsInitNoti) window.nsInitNoti();
-    setTimeout(() => {
-      const t = document.querySelector(".noti-btn") || b;
-      t.click();
-    }, 30);
-  });
+
+    let tab = "video";
+
+    function vRows() {
+      const all = (typeof VIDEOS !== "undefined" ? VIDEOS : []);
+      return getFavs().video.map(t => all.find(v => v.t === t) || { t: t, c: "", v: "", d: "", ph: 1 });
+    }
+
+    function renderFavs() {
+      const list = document.getElementById("favList");
+      const favs = getFavs();
+      document.getElementById("favCount").textContent =
+        "共 " + (favs.video.length + favs.creator.length) + " 条";
+      if (tab === "video") {
+        const rows = vRows();
+        list.innerHTML = rows.length ? rows.map(v => `
+          <a class="ns-row" href="watch.html?t=${encodeURIComponent(v.t)}&u=${encodeURIComponent(v.c || "")}">
+            <div class="ns-thumb"><img src="assets/covers/v${((v.ph - 1) % 64) + 1}.jpg" alt="${v.t}" onerror="this.style.visibility='hidden'"></div>
+            <div class="ns-row-main">
+              <b>${v.t}</b>
+              <span>${v.c ? v.c + " · " + v.v + " 次播放" : "已收藏"}</span>
+            </div>
+            <button class="ns-row-x" type="button" data-del="video" data-name="${v.t}" title="取消收藏">取消收藏</button>
+          </a>`).join("") : '<div class="fd-empty">还没有收藏的视频</div>';
+      } else {
+        const rows = (typeof CREATORS !== "undefined" ? CREATORS : [])
+          .filter(c => favs.creator.includes(c.n));
+        list.innerHTML = rows.length ? rows.map(c => `
+          <a class="ns-row" href="creator.html?u=${encodeURIComponent(c.n)}">
+            <div class="ns-thumb-round ava ph-${c.ph}"></div>
+            <div class="ns-row-main">
+              <b>${c.n}</b>
+              <span>${c.d} · ${c.f} 粉丝</span>
+            </div>
+            <button class="ns-row-x" type="button" data-del="creator" data-name="${c.n}" title="取消收藏">取消收藏</button>
+          </a>`).join("") : '<div class="fd-empty">还没有收藏的创作者</div>';
+      }
+    }
+
+    document.getElementById("favTabs").addEventListener("click", e => {
+      const b = e.target.closest("button");
+      if (!b) return;
+      document.querySelectorAll("#favTabs button").forEach(x => x.classList.remove("on"));
+      b.classList.add("on");
+      tab = b.dataset.tab;
+      renderFavs();
+    });
+
+    document.getElementById("favList").addEventListener("click", e => {
+      const b = e.target.closest("[data-del]");
+      if (!b) return;
+      e.preventDefault();
+      e.stopPropagation();
+      const favs = getFavs();
+      favs[b.dataset.del] = favs[b.dataset.del].filter(x => x !== b.dataset.name);
+      setFavs(favs);
+      renderFavs();
+      if (window.toast) toast("已取消收藏");
+    });
+
+    /* 通知页 */
+    function renderNotis() {
+      const box = document.getElementById("notiPageList");
+      const all = window.NS_NOTI || [];
+      const read = window.nsNotiRead ? window.nsNotiRead() : [];
+      box.innerHTML = all.length ? all.map(n => `
+        <a class="ns-noti ${read.includes(n.id) ? "" : "unread"}" href="${n.href || '#'}" data-id="${n.id}">
+          <div class="ava ${n.ava}" style="border-radius:50%;width:40px;height:40px;flex:0 0 40px"></div>
+          <div class="ns-noti-main">
+            <p><b>${n.who}</b> ${n.t}</p>
+            <span>${n.time}</span>
+          </div>
+          ${read.includes(n.id) ? "" : '<i class="n-dot"></i>'}
+        </a>`).join("") : '<div class="fd-empty">暂时没有通知</div>';
+      const unread = all.filter(n => !read.includes(n.id)).length;
+      const dot = document.getElementById("sideNotiDot");
+      if (dot) dot.style.display = unread ? "" : "none";
+      const cb = document.getElementById("notiClearAll");
+      if (cb) cb.style.display = unread ? "" : "none";
+    }
+
+    document.getElementById("notiPageList").addEventListener("click", e => {
+      const a = e.target.closest("[data-id]");
+      if (!a || !window.nsNotiRead) return;
+      const read = window.nsNotiRead();
+      if (!read.includes(a.dataset.id)) {
+        read.push(a.dataset.id);
+        window.nsNotiSetRead(read);
+        if (window.nsInitNoti) window.nsInitNoti();
+      }
+      renderNotis();
+    });
+
+    document.getElementById("notiClearAll").addEventListener("click", () => {
+      if (!window.nsNotiSetRead) return;
+      window.nsNotiSetRead((window.NS_NOTI || []).map(n => n.id));
+      if (window.nsInitNoti) window.nsInitNoti();
+      renderNotis();
+    });
+
+    renderFavs();
+    renderNotis();
+    document.addEventListener("ns:data-ready", renderFavs);
+
+    // 点侧栏时重渲染，数据总是新的
+    document.querySelectorAll("[data-pane-link]").forEach(a => {
+      a.addEventListener("click", () => {
+        if (a.dataset.paneLink === "favs") renderFavs();
+        if (a.dataset.paneLink === "notis") renderNotis();
+      });
+    });
+
+    if (location.hash === "#favs") document.querySelector('[data-pane-link="favs"]').click();
+    if (location.hash === "#notis") document.querySelector('[data-pane-link="notis"]').click();
+  })();
 </script>
 <script src="js/notice.js"></script>
 </body>

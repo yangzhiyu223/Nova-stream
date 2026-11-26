@@ -6,8 +6,10 @@
 <title>Nova Stream · 播放</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
+<link rel="stylesheet" href="css/night.css">
 <link rel="stylesheet" href="css/comments.css">
 <link rel="stylesheet" href="css/watchnav.css">
+<script src="js/hue.js"></script>
 </head>
 <body>
 
@@ -24,7 +26,8 @@
     <a href="upload.html">创作中心</a>
     <a href="profile.html">我的</a>
   </nav>
-  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+    <button class="icon-btn" title="消息">🔔</button>
+<a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
 </header>
 
 <div class="crumb-bar">
@@ -38,6 +41,7 @@
       <div class="stage" id="stage">
         <div class="art"></div>
         <button class="big-play" id="bigPlay">▶</button>
+        <div class="danmu-layer" id="dmLayer"></div>
         <div class="phint">这是占位画面，没有真实视频文件</div>
 
         <div class="glass">
@@ -46,13 +50,15 @@
             <div class="track"><div class="fill" id="fill"></div></div>
   </div>
           <div class="ctrl">
-            <button onclick="back()" title="返回">↩</button>
             <button id="pp" title="播放/暂停">▶</button>
             <span class="time" id="time">03:20 / 10:00</span>
             <div class="spacer"></div>
-            <button onclick="toast('已开启/关闭弹幕')" title="弹幕">💬</button>
-            <button onclick="toast('音量 +')" title="音量">🔊</button>
-            <button class="round" onclick="toast('已切换全屏')" title="全屏">⛶</button>
+            <button id="dmBtn" title="弹幕">💬</button>
+            <div class="vol-wrap" id="volWrap">
+              <button id="volBtn" title="音量">🔊</button>
+              <div class="vol-bar" id="volBar"><div class="vol-fill" id="volFill"></div></div>
+            </div>
+            <button class="round" id="fsBtn" title="全屏">⛶</button>
           </div>
         </div>
       </div>
@@ -135,7 +141,7 @@
   /* ---- 推荐列表 ---- */
   document.getElementById("recList").innerHTML = RECOMMEND.map(v => `
     <a class="rec-item" href="watch.html?t=${encodeURIComponent(v.t)}&u=${encodeURIComponent(v.c)}">
-      <div class="thumb ph-${v.ph}"></div>
+      <img class="thumb" src="assets/covers/v${((v.ph - 1) % 64) + 1}.jpg" alt="${v.t}" onerror="this.style.visibility='hidden'">
       <div>
         <h3>${v.t}</h3>
         <div class="sub">${v.c} · ${v.v}</div>
@@ -168,6 +174,7 @@
     stage.classList.add("show-hint");
     stage.classList.remove("show-ctrl");
     setTimeout(()=>stage.classList.remove("show-hint"), 1600);
+    if (typeof dmOn !== "undefined" && dmOn) startDanmu();
     timer = setInterval(()=>{
       cur = Math.min(TOTAL, cur + 1);
       paint();
@@ -181,11 +188,118 @@
     stage.classList.add("paused");
     stage.classList.add("show-ctrl");
     clearInterval(timer);
+    if (typeof stopDanmu === "function") stopDanmu();
   }
   function toggle(){ playing ? pause() : play(); }
 
   pp.onclick = toggle;
   document.getElementById("bigPlay").onclick = play;
+
+  /* ---- 全屏 ---- */
+  const fsBtn = document.getElementById("fsBtn");
+  function inFs(){
+    return document.fullscreenElement || document.webkitFullscreenElement;
+  }
+  function toggleFs(){
+    if (inFs()){
+      (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+    } else if (stage.requestFullscreen || stage.webkitRequestFullscreen){
+      (stage.requestFullscreen || stage.webkitRequestFullscreen).call(stage);
+    } else {
+      toast("这个浏览器不支持全屏");
+    }
+  }
+  fsBtn.onclick = e => { e.stopPropagation(); toggleFs(); };
+  ["fullscreenchange","webkitfullscreenchange"].forEach(ev =>
+    document.addEventListener(ev, () => {
+      const on = !!inFs();
+      fsBtn.textContent = on ? "⤢" : "⛶";
+      fsBtn.title = on ? "退出全屏" : "全屏";
+      stage.classList.toggle("is-fs", on);
+      // 全屏时键盘空格也能播停
+    })
+  );
+  document.addEventListener("keydown", e => {
+    if (e.code === "Space" && inFs() && !e.target.closest("input,textarea")){
+      e.preventDefault(); toggle();
+    }
+  });
+
+  /* ---- 音量滑条 ---- */
+  const volWrap = document.getElementById("volWrap");
+  const volBtn  = document.getElementById("volBtn");
+  const volBar  = document.getElementById("volBar");
+  const volFill = document.getElementById("volFill");
+  let vol = 0.7, lastVol = 0.7;
+
+  function paintVol(){
+    volFill.style.width = Math.round(vol*100)+"%";
+    volBtn.textContent = vol === 0 ? "🔇" : vol < 0.5 ? "🔉" : "🔊";
+  }
+  volBtn.onclick = e => {
+    e.stopPropagation();
+    volWrap.classList.toggle("open");
+    if (vol === 0){ vol = lastVol || 0.7; }
+    else { lastVol = vol; vol = 0; }
+    paintVol();
+  };
+  function setVolByX(clientX){
+    const r = volBar.getBoundingClientRect();
+    vol = Math.min(1, Math.max(0, (clientX - r.left)/r.width));
+    if (vol > 0) lastVol = vol;
+    paintVol();
+  }
+  let vDragging = false;
+  volBar.addEventListener("mousedown", e => { vDragging = true; setVolByX(e.clientX); e.stopPropagation(); });
+  window.addEventListener("mousemove", e => { if (vDragging) setVolByX(e.clientX); });
+  window.addEventListener("mouseup", () => { vDragging = false; });
+  volWrap.addEventListener("click", e => e.stopPropagation());
+  paintVol();
+
+  /* ---- 弹幕 ---- */
+  const dmBtn   = document.getElementById("dmBtn");
+  const dmLayer = document.getElementById("dmLayer");
+  const DM_POOL = [
+    "画质好舒服","这段光真好看","来了来了","循环第 3 遍",
+    "这个转场怎么回事","耳机党狂喜","深夜看这个太上头",
+    "截图当壁纸了","这里节奏刚刚好","安静得想睡觉",
+    "城市真美","音乐搭得妙","求完整版","这条片我收藏了"
+  ];
+  let dmOn = true, dmTimer = null, dmRow = 0;
+
+  function fireDanmu(){
+    if (!dmOn || !playing) return;
+    const el = document.createElement("div");
+    el.className = "dm-item";
+    el.textContent = DM_POOL[Math.floor(Math.random()*DM_POOL.length)];
+    const rows = 6;
+    el.style.top = (10 + (dmRow % rows) * 13) + "%";
+    dmRow++;
+    el.style.animationDuration = (9 + Math.random()*3) + "s";
+    dmLayer.appendChild(el);
+    requestAnimationFrame(() => {
+      const w = stage.clientWidth || window.innerWidth;
+      el.style.setProperty("--dm-dist", -(w + el.offsetWidth + 40) + "px");
+      el.classList.add("dm-run");
+    });
+    el.addEventListener("animationend", () => el.remove());
+  }
+  function startDanmu(){
+    stopDanmu();
+    dmTimer = setInterval(fireDanmu, 1400);
+    fireDanmu();
+  }
+  function stopDanmu(){ if (dmTimer){ clearInterval(dmTimer); dmTimer = null; } }
+
+  dmBtn.onclick = e => {
+    e.stopPropagation();
+    dmOn = !dmOn;
+    dmLayer.classList.toggle("off", !dmOn);
+    dmBtn.classList.toggle("off", !dmOn);
+    toast(dmOn ? "弹幕已开启" : "弹幕已关闭");
+    if (dmOn && playing) startDanmu(); else stopDanmu();
+  };
+  dmLayer.addEventListener("click", e => e.stopPropagation());
 
   /* 悬停进度条显示时间预览 */
   bar.addEventListener("mousemove", e => {
@@ -200,10 +314,10 @@
     paint();
   });
 
-  /* 点播放区切换控制栏，悬停不再自动弹出 */
+  /* 点播放区：暂停 / 继续 */
   stage.addEventListener("click", e=>{
     if (e.target.closest(".glass") || e.target.closest(".big-play")) return;
-    stage.classList.toggle("show-ctrl");
+    toggle();
   });
 
   function back(){
@@ -234,16 +348,16 @@
 
   /* ---- 留言面板 ---- */
   let CM = [
-    { id:1, n:"橘子汽水", t:"这个转场太丝滑了，求教一下参数，是手持还是稳定器？", s:"2 小时前", like:126, me:false, rep:[] },
-    { id:2, n:"小鹿乱撞", t:"南京西路那段我熟，晚上确实好看，就是人太多了", s:"5 小时前", like:84, me:false,
+    { id:1, n:"橘子汽水", t:"这个转场太丝滑了，求教一下参数，是手持还是稳定器？", s:"2 小时前", ts:120, like:126, me:false, rep:[] },
+    { id:2, n:"小鹿乱撞", t:"南京西路那段我熟，晚上确实好看，就是人太多了", s:"5 小时前", ts:300, like:84, me:false,
       rep:[{ n:"Maya Chen", t:"对，得挑工作日去，周末挤不进去" }] },
-    { id:3, n:"阿强", t:"已经收藏，下次去上海照着走一遍", s:"6 小时前", like:41, me:false, rep:[] },
-    { id:4, n:"夜色", t:"配乐是什么名字啊，找了好久没找到", s:"昨天", like:33, me:false,
+    { id:3, n:"阿强", t:"已经收藏，下次去上海照着走一遍", s:"6 小时前", ts:360, like:41, me:false, rep:[] },
+    { id:4, n:"夜色", t:"配乐是什么名字啊，找了好久没找到", s:"昨天", ts:1440, like:33, me:false,
       rep:[{ n:"橘子汽水", t:"好像是原创的，评论区有人提过" }] },
-    { id:5, n:"Kaya", t:"看了一整遍，很治愈，久违的慢节奏", s:"昨天", like:27, me:false, rep:[] },
-    { id:6, n:"老周不打烊", t:"调色偏暖，跟上海那种湿冷的天气正好对上了", s:"2 天前", like:19, me:false, rep:[] },
-    { id:7, n:"一只小满", t:"相机型号求告知，谢谢～", s:"2 天前", like:12, me:false, rep:[] },
-    { id:8, n:"夜里三点", t:"看到最后那句「守到灯全亮」有点感动", s:"3 天前", like:9, me:false, rep:[] }
+    { id:5, n:"Kaya", t:"看了一整遍，很治愈，久违的慢节奏", s:"昨天", ts:1500, like:27, me:false, rep:[] },
+    { id:6, n:"老周不打烊", t:"调色偏暖，跟上海那种湿冷的天氪正好对上了", s:"2 天前", ts:2880, like:19, me:false, rep:[] },
+    { id:7, n:"一只小满", t:"相机型号求告知，谢谢～", s:"2 天前", ts:3000, like:12, me:false, rep:[] },
+    { id:8, n:"夜里三点", t:"看到最后那句「守到灯全亮」有点感动", s:"3 天前", ts:4320, like:9, me:false, rep:[] }
   ];
   let sortBy = "hot", shown = 5, replyTo = null;
 
@@ -254,7 +368,7 @@
     const arr = [...CM];
     return sortBy === "hot"
       ? arr.sort((a,b)=> b.like - a.like)
-      : arr.sort((a,b)=> b.id - a.id);
+      : arr.sort((a,b)=> a.ts - b.ts);
   }
   function renderCm(){
     const list = sorted();
@@ -263,9 +377,9 @@
       const av = (c.id % 8) + 1;
       return `
       <div class="cm">
-        <div class="ava ph-${av}" style="border-radius:50%"></div>
+        <a class="cm-ava ava ph-${av}" style="border-radius:50%" href="creator.html?u=${encodeURIComponent(c.n)}&from=watch" title="${esc(c.n)}"></a>
         <div class="cm-body">
-          <p class="name">${esc(c.n)} <span>· ${esc(c.s)}</span></p>
+          <p class="name"><a class="cm-name" href="creator.html?u=${encodeURIComponent(c.n)}&from=watch">${esc(c.n)}</a> <span>· ${esc(c.s)}</span></p>
           <p class="txt">${esc(c.t)}</p>
           <div class="cm-acts">
             <button class="likebtn ${c.me?'on':''}" onclick="likeCm(${c.id})">
@@ -274,7 +388,7 @@
             <button onclick="replyToCm(${c.id}, '${esc(c.n)}')">回复</button>
           </div>
           ${c.rep.length ? `<div class="reps">${c.rep.map(r=>`
-            <div class="rep"><b>${esc(r.n)}</b>：${esc(r.t)}</div>`).join("")}</div>` : ""}
+            <div class="rep"><a class="cm-name" href="creator.html?u=${encodeURIComponent(r.n)}&from=watch"><b>${esc(r.n)}</b></a>：${esc(r.t)}</div>`).join("")}</div>` : ""}
         </div>
       </div>`;
     }).join("") : `
@@ -321,7 +435,7 @@
     if (!v) { toast("说点什么再发吧"); inp.focus(); return; }
     const id = Math.max(...CM.map(x=>x.id)) + 1;
     const body = v.replace(/^@\S+\s*/, "");
-    const item = { id, n:"我", t:body, s:"刚刚", like:0, me:false, rep:[] };
+    const item = { id, n:"我", t:body, s:"刚刚", ts:0, like:0, me:false, rep:[] };
 
     if (replyTo && v.startsWith("@" + replyTo.name)) {
       const target = CM.find(x=>x.id === replyTo.id);
@@ -376,6 +490,8 @@
       document.title = "Nova Stream · " + v.t;
       const play = document.querySelector(".vinfo .dur");
       if (play) play.textContent = v.v + " 次播放";
+      const art = document.querySelector(".stage .art");
+      if (art) art.style.backgroundImage = 'url(assets/covers/v' + ((v.ph % 64) + 1) + '.jpg)';
     }
     const h1 = document.querySelector(".vinfo h1");
     if (who && h1){

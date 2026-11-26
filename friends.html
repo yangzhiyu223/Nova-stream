@@ -6,6 +6,8 @@
 <title>Nova Stream · 好友</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
+<link rel="stylesheet" href="css/night.css">
+<script src="js/hue.js"></script>
 </head>
 <body>
 
@@ -22,7 +24,8 @@
     <a href="upload.html">创作中心</a>
     <a href="profile.html">我的</a>
   </nav>
-  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+    <button class="icon-btn" title="消息">🔔</button>
+<a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
 </header>
 
 <div class="fd-wrap">
@@ -113,7 +116,7 @@
       <article class="fd-card" data-name="${f.n}">
         <div class="fd-card-top">
           <a href="creator.html?u=${uri(f.n)}&from=friends" title="${f.n}" style="position:relative;display:block;flex:0 0 46px">
-            <div class="ava ph-${f.ava}"></div>
+            <div class="ava ${f.ava}"></div>
             <i class="fd-online ${f.on ? "on" : ""}"></i>
           </a>
           <div class="who">
@@ -156,7 +159,7 @@
       const last = msgs[msgs.length - 1] || { t:"" };
       return `
         <div class="fd-conv ${n === conv ? "on" : ""}" data-conv="${n}">
-          <div class="ava ph-${f.ava}"></div>
+          <div class="ava ${f.ava}"></div>
           <div class="txt"><b>${n}</b><span>${last.t}</span></div>
         </div>`;
     }).join("");
@@ -170,7 +173,7 @@
         <div class="fd-convs">${list}</div>
         <div class="fd-chatbox">
           <div class="fd-chathead">
-            <div class="ava ph-${f.ava}"></div>
+            <div class="ava ${f.ava}"></div>
             <a href="creator.html?u=${uri(conv)}&from=friends"><b>${conv}</b></a>
             <span style="font-size:11.5px;color:var(--ink-3)">${f.on ? "在线" : "离线"}</span>
           </div>

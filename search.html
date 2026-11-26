@@ -6,6 +6,8 @@
 <title>Nova Stream · 搜索</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
+<link rel="stylesheet" href="css/night.css">
+<script src="js/hue.js"></script>
 </head>
 <body>
 
@@ -19,8 +21,9 @@
     <a href="upload.html">创作中心</a>
     <a href="profile.html">我的</a>
   </nav>
-  <a href="profile.html"><img class="avatar ph-2" alt="头像"></a>
-</header></header>
+    <button class="icon-btn" title="消息">🔔</button>
+<a href="profile.html"><img class="avatar ph-2" alt="头像"></a>
+</header>
 
 <div class="suggest-wrap">
   <div class="search-big" id="bar">
@@ -141,12 +144,12 @@
   function videoRow(v){
     return `
     <a href="watch.html?t=${encodeURIComponent(v.t)}&u=${encodeURIComponent(v.c)}" class="res-row">
-      <div class="ph-${v.ph} res-thumb"></div>
+      <img class="res-thumb" src="assets/covers/v${((v.ph - 1) % 64) + 1}.jpg" alt="${v.t}" onerror="this.style.visibility='hidden'">
       <div class="res-main">
         <h3>${v.t}</h3>
         <p>${v.t} · 这段简介是占位文本，用来演示两行截断。内容与视频无关。</p>
         <div class="res-meta">
-          <a href="creator.html?u=${encodeURIComponent(v.c)}&from=search" class="ph-${v.ph} res-ava"></a>
+          <img class="res-ava" src="assets/avatars/a${((v.ph - 1) % 10) + 1}.jpg" alt="" onerror="this.style.visibility='hidden'">
           <a href="creator.html?u=${encodeURIComponent(v.c)}&from=search">${v.c}</a>
           <span>·</span><span>${v.v} 次播放</span><span>·</span><span>${v.d}</span>
         </div>
@@ -158,7 +161,7 @@
     const on = isSub(c.n);
     return `
     <div class="res-row res-user">
-      <a href="creator.html?u=${encodeURIComponent(c.n)}&from=search" class="ph-${c.ph} res-ava-big"></a>
+      <img class="res-ava-big" src="assets/avatars/a${((c.ph - 1) % 10) + 1}.jpg" alt="${c.n}" onerror="this.style.visibility='hidden'">
       <div class="res-main">
         <h3><a href="creator.html?u=${encodeURIComponent(c.n)}&from=search">${c.n}</a></h3>
         <p>${c.d} · ${c.f} 粉丝</p>

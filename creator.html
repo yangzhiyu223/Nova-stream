@@ -6,6 +6,7 @@
 <title>Nova Stream · 创作者主页</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
+<link rel="stylesheet" href="css/night.css">
 <style>
   .cover{
     height:210px;border-radius:0 0 28px 28px;position:relative;overflow:hidden;
@@ -31,6 +32,7 @@
   .tabs a.on{color:var(--ink);font-weight:700}
   .tabs a.on::after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:3px;border-radius:3px;background:var(--orange)}
 </style>
+<script src="js/hue.js"></script>
 </head>
 <body>
 
@@ -47,7 +49,8 @@
     <a href="upload.html">创作中心</a>
     <a href="profile.html">我的</a>
   </nav>
-  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+    <button class="icon-btn" title="消息">🔔</button>
+<a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
 </header>
 
 <div class="crumb-bar" style="max-width:1060px;margin:20px auto -4px;padding:0 26px;display:flex;align-items:center;gap:12px">

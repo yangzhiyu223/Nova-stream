@@ -90,3 +90,5 @@ function markNav() {
   });
 }
 document.addEventListener("DOMContentLoaded", markNav);
+
+document.dispatchEvent(new CustomEvent("ns:data-ready"));

@@ -38,6 +38,10 @@
 .cm .ava{width:38px;height:38px;flex:0 0 auto}
 .cm-body{flex:1;min-width:0}
 .cm .name{margin:0 0 7px;font-size:13px;font-weight:700;color:var(--ink-2)}
+.cm-name{color:inherit;text-decoration:none;transition:color .16s}
+.cm-name:hover{color:var(--orange)}
+.cm-ava{display:block;transition:transform .16s,box-shadow .16s}
+.cm-ava:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(20,30,45,.16)}
 .cm .name span{font-weight:400;color:var(--ink-3);font-size:12px}
 .cm .txt{margin:0;font-size:14px;line-height:1.85;color:var(--ink);word-break:break-word}
 .cm-acts{display:flex;gap:20px;margin-top:11px}

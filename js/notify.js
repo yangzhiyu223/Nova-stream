@@ -20,6 +20,12 @@
       href:"watch.html?t=" + encodeURIComponent("雨后森林 · 白噪音一小时") + "&u=" + encodeURIComponent("Music Vibes") }
   ];
 
+  window.NS_NOTI = NOTIS;
+  window.nsNotiRead = function () {
+    try { return JSON.parse(localStorage.getItem(READ_KEY)) || []; } catch (e) { return []; }
+  };
+  window.nsNotiSetRead = function (v) { localStorage.setItem(READ_KEY, JSON.stringify(v)); };
+
   function getRead() {
     try { return JSON.parse(localStorage.getItem(READ_KEY)) || []; } catch(e) { return []; }
   }
