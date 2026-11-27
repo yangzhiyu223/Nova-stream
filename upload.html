@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
 <link rel="stylesheet" href="css/night.css">
+<link rel="stylesheet" href="css/account.css">
 <link rel="stylesheet" href="css/upload.css">
 <script src="js/hue.js"></script>
 </head>
@@ -24,10 +25,10 @@
     <a href="creators.html" data-page="creators.html">创作者</a>
     <a href="friends.html" data-page="friends.html">好友</a>
     <a href="upload.html" data-page="upload.html" class="active">创作中心</a>
-    <a href="profile.html" data-page="profile.html">我的</a>
+    <a href="profile.html" data-page="profile.html" class="ns-need-login">我的</a>
   </nav>
   <button class="icon-btn" title="消息">🔔</button>
-  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+  <span class="nav-me"><b data-ns-account>游客</b><a href="profile.html" class="avatar-link" title="我的主页"><img class="avatar ph-1" alt="头像"></a></span>
 </header>
 
 <div class="up-wrap">
@@ -436,6 +437,7 @@ syncPreview();
 
 /* 发布校验 */
 function publish(){
+  if (window.NSAuth && !NSAuth.requireLogin("上传作品")) return;
   if (!$("title").value.trim()) { toast("先给作品起个标题"); $("title").focus(); return; }
   if (!$("fileItem").offsetParent) { toast("还没上传视频文件"); return; }
   if ($("filePct").textContent !== "100%") { toast("视频还在上传，等一会儿"); return; }
@@ -446,5 +448,6 @@ function publish(){
 </script>
 <script src="js/notify.js"></script>
 <script src="js/notice.js"></script>
+<script src="js/account.js"></script>
 </body>
 </html>

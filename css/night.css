@@ -281,25 +281,6 @@ body::after{
 :root{ --ns-ink:#eaf0ff; }
 
 /* 登录页 */
-.login-wrap{
-  background:
-    radial-gradient(900px 520px at 12% 6%, rgba(120,140,255,.22), transparent 62%),
-    radial-gradient(900px 560px at 90% 94%, rgba(20,184,166,.18), transparent 64%),
-    linear-gradient(160deg,#0b0f1b,#0e1220 55%,#0a0d16)!important;
-}
-.login-wrap::before{background:radial-gradient(circle at 35% 35%,rgba(255,138,61,.35),transparent 66%)!important}
-.login-wrap::after{background:radial-gradient(circle at 60% 40%,rgba(120,140,255,.30),transparent 66%)!important}
-.login-card{
-  background:rgba(255,255,255,.07)!important;
-  border:1px solid rgba(255,255,255,.12)!important;
-  box-shadow:0 30px 80px rgba(0,0,0,.55)!important;
-  backdrop-filter:blur(20px) saturate(1.2);
-  -webkit-backdrop-filter:blur(20px) saturate(1.2);
-  color:var(--ns-txt);
-}
-.login-card h1{color:#fff}
-.login-card .lead,.login-foot,.login-foot *{color:var(--ns-txt-2)}
-.login-foot a{color:var(--ns-amber)}
 .field input{
   background:rgba(255,255,255,.06)!important;
   border:1px solid rgba(255,255,255,.12)!important;
@@ -318,7 +299,7 @@ body::after{
 .panel,.card,.about-box,.series,.res-row,.feed-card,.feed-item,
 .fd-card,.fd-convs,.fd-chatbox,.fd-req,.ns-row,.ns-noti,.ns-stat,
 .prof,.set-panel,.up-main,.up-side,.stage,.panel-back,.pane,
-.cat-grid a,.cr-card,.pc-panel,.tag-box,.glass{
+.cat-grid a,.cr-card,.pc-panel,.tag-box{
   background:rgba(255,255,255,.05)!important;
   border-color:rgba(255,255,255,.10)!important;
   color:var(--ns-txt);
@@ -336,7 +317,7 @@ body::after{
 /* 标题/正文通用色 */
 h1,h2,h3,h4,.sec-head h2,.res-title,.ns-row-main,.ns-title,.panel-head h3,
 .prof-head h2,.up-head h1,.cat-name,.fd-chathead strong,.fd-name,.about-box h2{color:#fff!important}
-p,.sub,.meta,.res-meta,.ns-meta,.hint,.tip,.set-menu a,.lead,.phint,.cr-sub,
+p,.sub,.meta,.res-meta,.ns-meta,.hint,.tip,.set-menu a,.lead,.cr-sub,
 .about-box p,.about-box li,.up-tip,.fd-desc{color:var(--ns-txt-2)!important}
 .tiny,.label,.crumb,.crumbs,.crumb-bar,.res-label,.fd-tabs{color:var(--ns-txt-3)!important}
 .crumbs a,.crumb a{color:var(--ns-txt-2)!important}
@@ -673,3 +654,130 @@ select option{background:#151b2b;color:#fff}
 .panel{background:rgba(255,255,255,.05)!important;box-shadow:none!important;border:1px solid rgba(255,255,255,.10)!important}
 .tipbox{background:rgba(255,138,61,.10)!important;border:1px solid rgba(255,138,61,.28)!important;color:var(--ns-txt-2)!important}
 .tipbox *{color:var(--ns-txt-2)!important}
+
+/* ===== 输入框去白底（统一深色） ===== */
+.field input,
+.auth-card input,
+.search input,
+input[type=text],input[type=email],input[type=password],input[type=search],input[type=tel],
+textarea,select{
+  background:rgba(255,255,255,.045)!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  color:#eef2f7!important;
+  caret-color:#ff8a3d;
+  -webkit-text-fill-color:#eef2f7;
+  box-shadow:none;
+}
+.field input::placeholder,
+.search input::placeholder,
+textarea::placeholder{color:rgba(255,255,255,.34)!important}
+.field input:focus,
+.search input:focus,
+textarea:focus,select:focus{
+  background:rgba(255,255,255,.075)!important;
+  border-color:rgba(255,138,61,.55)!important;
+  box-shadow:0 0 0 4px rgba(255,138,61,.12)!important;
+}
+/* 搜索框内层不要自己的边框和光晕，交给外壳 */
+.search input,
+.search input:focus{
+  border:none!important;
+  box-shadow:none!important;
+  background:transparent!important;
+  border-radius:0;
+}
+/* 搜索框外壳别在聚焦时变白 */
+.search:focus-within{background:rgba(255,255,255,.07)!important;border-color:rgba(255,138,61,.45)!important;box-shadow:0 0 0 4px rgba(255,138,61,.10)!important}
+/* 浏览器自动填充也不要白底 */
+input:-webkit-autofill,input:-webkit-autofill:focus{
+  -webkit-box-shadow:0 0 0 1000px #151b2b inset!important;
+  -webkit-text-fill-color:#eef2f7!important;
+  transition:background-color 9999s ease-out;
+}
+/* 复选框、下拉、日期等原生控件跟着深色 */
+select option{background:#141a2c;color:#eef2f7}
+
+/* 登录/注册面板返回按钮（原来是白底药丸） */
+.pane-back{
+  background:rgba(255,255,255,.06)!important;
+  border:1px solid rgba(255,255,255,.12)!important;
+  color:rgba(255,255,255,.72)!important;
+}
+.pane-back:hover{
+  background:rgba(255,138,61,.14)!important;
+  border-color:rgba(255,138,61,.45)!important;
+  color:#ff8a3d!important;
+}
+/* 同意条款复选框 */
+input[type=checkbox]{
+  accent-color:#ff8a3d;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.22);
+}
+input[type=checkbox]::-webkit-color-swatch{background:transparent}
+
+
+/* ===== 全局兜底：任何残留白底一律压成深色 ===== */
+[style*="background:#fff"],[style*="background: #fff"],
+[style*="background:#ffffff"],[style*="background: #ffffff"],
+[style*="background-color:#fff"],[style*="background-color:#ffffff"],
+[style*="background:white"],[style*="background: white"],
+[style*="background:#f2f6f9"],[style*="background:#f5"],[style*="background:#fff0"],
+[style*="background:#fafafa"],[style*="background:#f7"],[style*="background:#f8"],
+[style*="background:#f9"],[style*="background:#ece"],[style*="background:#eef"],
+[style*="background:#eee"],[style*="background:#e5"]{
+  background:rgba(255,255,255,.06)!important;
+  border-color:rgba(255,255,255,.12)!important;
+}
+[style*="color:#5b6472"],[style*="color:#666"],[style*="color:#333"],
+[style*="color:#444"],[style*="color:#222"],[style*="color:#111"],
+[style*="color:#000"],[style*="color:#555"]{color:rgba(255,255,255,.78)!important}
+
+/* 播放器、卡片、弹窗、按钮统一深色 */
+.video-shell,.player,.v-player,.player-wrap,.video-box{background:#000!important;border-color:rgba(255,255,255,.10)!important}
+.modal,.dialog,.popover,.toast,.reply-box,.chip,.pill,
+.badge,.durs,span.dur,.dur{background-color:rgba(255,255,255,.06)!important;color:rgba(255,255,255,.82)!important;border-color:rgba(255,255,255,.12)!important}
+.dur,.durs{color:#eef2f7!important}
+button:not(.btn-primary):not(.lg-gate-btn):not(.hero-glow){
+  background-color:rgba(255,255,255,.06);
+  color:rgba(255,255,255,.80);
+  border-color:rgba(255,255,255,.12);
+}
+.btn:not(.btn-primary){background:rgba(255,255,255,.07)!important;color:rgba(255,255,255,.82)!important;border:1px solid rgba(255,255,255,.12)!important}
+.btn-ghost{background:rgba(255,255,255,.06)!important;color:rgba(255,255,255,.80)!important;border:1px solid rgba(255,255,255,.12)!important}
+.table th,.table td{border-color:rgba(255,255,255,.10)!important}
+.sss{display:none}
+
+
+/* ===== 变量层：把浅色主题的 ink/card/line 全部翻成深色 ===== */
+:root{
+  --ink:#eef2f7;
+  --ink-2:rgba(255,255,255,.68);
+  --ink-3:rgba(255,255,255,.44);
+  --line:rgba(255,255,255,.10);
+  --bg:#0b0f1b;
+  --card:rgba(255,255,255,.05);
+  --sh-sm:0 2px 10px rgba(0,0,0,.28);
+  --sh-md:0 10px 28px rgba(0,0,0,.34);
+  --sh-lg:0 22px 54px rgba(0,0,0,.44);
+}
+
+/* 自动填充不要刷白 */
+.field input:-webkit-autofill,
+.field input:-webkit-autofill:hover,
+.field input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#fff!important;
+  -webkit-box-shadow:0 0 0 1000px #1b2233 inset!important;
+  transition:background-color 9999s ease-out 0s!important;
+  caret-color:#f97316;
+}
+.field input:focus{caret-color:#f97316}
+
+/* 好友页：搜索框去框去阴影，发消息按钮去光晕 */
+.fd-search{background:rgba(255,255,255,.05)!important;border:0!important;box-shadow:none!important}
+.fd-search:focus-within{background:rgba(255,255,255,.08)!important;border:0!important}
+.fd-search input{color:#fff!important;background:transparent!important;border:0!important}
+.fd-search input::placeholder{color:var(--ns-txt-3)!important}
+.fd-foot .btn-main{box-shadow:none!important}
+.fd-foot .btn-main:hover{box-shadow:none!important}
+.fd-foot .btn-main.done{box-shadow:none!important}

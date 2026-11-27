@@ -6,24 +6,31 @@
 <title>Nova Stream · 页面走丢了</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/night.css">
+<link rel="stylesheet" href="css/account.css">
 <style>
+  body{background:#080d18}
   .e404{min-height:100vh;display:grid;place-items:center;text-align:center;padding:40px 24px;
-    background:radial-gradient(700px 420px at 50% 34%,#fff6ef,transparent 62%),linear-gradient(180deg,#fdfefe,#eef2f7)}
-  .e404 h1{margin:26px 0 10px;font-size:28px;letter-spacing:.4px}
-  .e404 p{margin:0 0 28px;font-size:14px;color:var(--ink-3);line-height:1.9}
+    color:#eef2f7;position:relative;overflow:hidden;
+    background:
+      radial-gradient(760px 460px at 50% 30%, rgba(249,115,22,.16), transparent 62%),
+      radial-gradient(700px 420px at 82% 84%, rgba(46,201,186,.14), transparent 62%),
+      linear-gradient(180deg,#0f1728,#0b1120 58%,#080d18)}
+  .e404 h1{margin:26px 0 10px;font-size:28px;letter-spacing:.4px;color:#f4f7fb}
+  .e404 p{margin:0 0 28px;font-size:14px;color:#8d97a8;line-height:1.9}
   .num{display:flex;align-items:center;justify-content:center;gap:6px;font-size:96px;font-weight:800;
-    line-height:1;letter-spacing:2px}
+    line-height:1;letter-spacing:2px;color:#7fa0a4}
   .num .z{position:relative;width:96px;height:96px;display:grid;place-items:center}
   .num .z .ring{
     width:82px;height:82px;border-radius:50%;
     background:conic-gradient(from 210deg,#f97316 0 62%,#2ec9ba 62% 100%);
-    display:grid;place-items:center;color:#fff;font-size:26px;font-weight:800;
-    box-shadow:0 16px 34px rgba(249,115,22,.28);
+    display:grid;place-items:center;color:#04231f;font-size:26px;font-weight:800;
+    box-shadow:0 16px 38px rgba(249,115,22,.32),0 0 0 1px rgba(255,255,255,.08) inset;
     animation:spin 9s linear infinite;
   }
   .num .z .base{position:absolute;bottom:-6px;width:96px;height:22px;border-radius:50%;
-    background:linear-gradient(90deg,#17b3a5,#3fd6c7);filter:blur(.4px);z-index:-1}
-  .num .o{background:linear-gradient(120deg,#f97316,#2ec9ba);-webkit-background-clip:text;background-clip:text;color:transparent}
+    background:linear-gradient(90deg,#17b3a5,#3fd6c7);filter:blur(.4px);z-index:-1;opacity:.85}
+  .num .o{background:linear-gradient(120deg,#f97316,#2ec9ba);-webkit-background-clip:text;background-clip:text;color:transparent;filter:drop-shadow(0 8px 20px rgba(249,115,22,.25))}
+  .btn-primary{box-shadow:0 14px 32px rgba(249,115,22,.3)}
   @keyframes spin{to{transform:rotate(360deg)}}
 </style>
 <script src="js/hue.js"></script>
@@ -43,5 +50,6 @@
 </div>
 <script src="js/notify.js"></script>
 <script src="js/notice.js"></script>
+<script src="js/account.js"></script>
 </body>
 </html>

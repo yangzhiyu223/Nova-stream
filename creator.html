@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
 <link rel="stylesheet" href="css/night.css">
+<link rel="stylesheet" href="css/account.css">
 <style>
   .cover{
     height:210px;border-radius:0 0 28px 28px;position:relative;overflow:hidden;
@@ -47,10 +48,10 @@
     <a href="creators.html">创作者</a>
     <a href="friends.html" id="navFriends">好友</a>
     <a href="upload.html">创作中心</a>
-    <a href="profile.html">我的</a>
+    <a href="profile.html" class="ns-need-login">我的</a>
   </nav>
     <button class="icon-btn" title="消息">🔔</button>
-<a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+<span class="nav-me"><b data-ns-account>游客</b><a href="profile.html" class="avatar-link" title="我的主页"><img class="avatar ph-1" alt="头像"></a></span>
 </header>
 
 <div class="crumb-bar" style="max-width:1060px;margin:20px auto -4px;padding:0 26px;display:flex;align-items:center;gap:12px">
@@ -218,9 +219,10 @@
   });
 
   showTab((location.hash || "#works").slice(1));
-  f.addEventListener("click", () => { toggleSub(me.n); paintFollow(); });
+  f.addEventListener("click", () => { if (window.NSAuth && !NSAuth.requireLogin("关注")) return; toggleSub(me.n); paintFollow(); });
 </script>
 <script src="js/notify.js"></script>
 <script src="js/notice.js"></script>
+<script src="js/account.js"></script>
 </body>
 </html>

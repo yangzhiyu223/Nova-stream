@@ -7,36 +7,68 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
 <link rel="stylesheet" href="css/night.css">
+<link rel="stylesheet" href="css/account.css">
 <style>
   .set-wrap{max-width:960px;margin:22px auto 70px;padding:0 24px;
     display:grid;grid-template-columns:240px 1fr;gap:24px}
-  .set-menu{background:#fff;border-radius:28px;padding:24px 16px;box-shadow:var(--sh-md);height:max-content}
+  .set-menu{background:rgba(255,255,255,.05);border-radius:28px;padding:24px 16px;box-shadow:var(--sh-md);height:max-content}
   .set-menu a{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:14px;
     font-size:14px;color:var(--ink-2);transition:.2s;position:relative}
-  .set-menu a:hover{background:#f6f8fa;color:var(--ink)}
-  .set-menu a.on{color:var(--ink);font-weight:700;background:#f6f8fa}
+  .set-menu a:hover{background:rgba(255,255,255,.07);color:var(--ink)}
+  .set-menu a.on{color:var(--ink);font-weight:700;background:rgba(255,255,255,.07)}
   .set-menu a.on::before{content:"";position:absolute;left:0;top:13px;bottom:13px;width:3px;
     border-radius:3px;background:var(--orange)}
-  .set-panel{background:#fff;border-radius:28px;padding:34px 36px;box-shadow:var(--sh-md)}
+  .set-panel{background:rgba(255,255,255,.05);border-radius:28px;padding:34px 36px;box-shadow:var(--sh-md)}
   .set-panel h1{margin:0 0 8px;font-size:23px}
+  .danger-zone{margin-top:34px;padding:22px 24px;border-radius:20px;
+    background:rgba(249,115,22,.06);border:1px solid rgba(249,115,22,.22)}
+  .danger-zone h3{margin:0 0 8px;font-size:15px;color:#ffb27a}
+  .danger-zone p{margin:0 0 16px;font-size:13px;line-height:1.7;color:var(--ink-3)}
+  .btn-danger{background:rgba(249,115,22,.16);border:1px solid rgba(249,115,22,.45);
+    color:#ffb27a;padding:11px 22px;border-radius:12px;font-size:14px;font-weight:700;
+    font-family:inherit;cursor:pointer;transition:.18s}
+  .btn-danger:hover{background:rgba(249,115,22,.28);color:#fff}
+  .dlg-mask{position:fixed;inset:0;background:rgba(6,9,16,.66);backdrop-filter:blur(6px);
+    display:flex;align-items:center;justify-content:center;padding:20px;z-index:200;opacity:0;
+    transition:opacity .2s}
+  .dlg-mask.on{opacity:1}
+  .dlg{width:100%;max-width:380px;background:#161d2e;border:1px solid rgba(255,255,255,.12);
+    border-radius:22px;padding:28px 26px 22px;box-shadow:0 30px 80px rgba(0,0,0,.6);
+    transform:translateY(10px) scale(.98);transition:.22s;color:#e9eef7}
+  .dlg-mask.on .dlg{transform:none}
+  .dlg h2{margin:0 0 10px;font-size:18px}
+  .dlg p{margin:0 0 16px;font-size:13px;line-height:1.7;color:#8d97a8}
+  .dlg input{width:100%;height:44px;padding:0 14px;border-radius:12px;font-size:14px;
+    font-family:inherit;color:#eef2f9;background:rgba(255,255,255,.06);
+    border:1px solid rgba(255,255,255,.14);outline:none;margin:0 0 4px}
+  .dlg input:focus{border-color:#f97316;box-shadow:0 0 0 3px rgba(249,115,22,.16)}
+  .dlg .tip{margin:0 0 18px;font-size:12.5px;color:#ff8a7a;min-height:16px}
+  .dlg-row{display:flex;gap:10px}
+  .dlg-row button{flex:1;height:44px;border-radius:13px;font-size:14px;font-weight:700;
+    font-family:inherit;cursor:pointer;border:0;transition:.18s}
+  .dlg-cancel{background:rgba(255,255,255,.08);color:#c3cddd}
+  .dlg-cancel:hover{background:rgba(255,255,255,.14)}
+  .dlg-ok{background:linear-gradient(135deg,#ffb066,#f97316);color:#12202f}
+  .dlg-ok:hover{filter:brightness(1.06)}
+  .dlg-ok:disabled{opacity:.4;cursor:not-allowed;filter:none}
   .set-panel .sub{margin:0 0 28px;font-size:13.5px;color:var(--ink-3)}
   .f-row{margin-bottom:18px}
   .f-row label{display:block;font-size:13px;color:var(--ink-2);margin-bottom:8px;font-weight:600}
   .f-row input,.f-row select{
     width:100%;height:52px;padding:0 18px;border-radius:999px;
-    border:1px solid #e8ebf0;background:#fff;font-size:14px;transition:.2s;
+    border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);font-size:14px;transition:.2s;
   }
   .f-row input:focus,.f-row select:focus{border-color:var(--orange);box-shadow:0 0 0 4px rgba(249,115,22,.1)}
-  .f-row input:disabled{background:#f7f9fb;color:var(--ink-3)}
+  .f-row input:disabled{background:rgba(255,255,255,.045);color:var(--ink-3)}
   .save{width:100%;height:52px;margin-top:10px;font-size:15px}
   .switch-row{display:flex;align-items:center;justify-content:space-between;
     padding:18px 0;border-bottom:1px solid #f4f6f9}
   .switch-row:last-of-type{border:none}
   .switch-row .k{font-size:14px;font-weight:600}
   .switch-row .k small{display:block;font-weight:400;color:var(--ink-3);font-size:12.5px;margin-top:5px}
-  .tg{width:50px;height:29px;border-radius:99px;background:#e6eaf0;position:relative;transition:.24s;flex:0 0 auto}
+  .tg{width:50px;height:29px;border-radius:99px;background:rgba(255,255,255,.14);position:relative;transition:.24s;flex:0 0 auto}
   .tg::after{content:"";position:absolute;left:3px;top:3px;width:23px;height:23px;border-radius:50%;
-    background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.16);transition:.24s}
+    background:rgba(255,255,255,.05);box-shadow:0 2px 6px rgba(0,0,0,.16);transition:.24s}
   .tg.on{background:linear-gradient(100deg,#14b8a6,#2ec9ba)}
   .tg.on::after{left:24px}
   .swatch{display:flex;gap:12px;margin-top:10px}
@@ -59,6 +91,7 @@
   .tabpane.on{display:block}
 </style>
 <script src="js/hue.js"></script>
+<script src="js/account.js"></script>
 </head>
 <body>
 
@@ -73,10 +106,10 @@
     <a href="creators.html">创作者</a>
     <a href="friends.html">好友</a>
     <a href="upload.html">创作中心</a>
-    <a href="profile.html" class="active">我的</a>
+    <a href="profile.html" class="active ns-need-login">我的</a>
   </nav>
     <button class="icon-btn" title="消息">🔔</button>
-<a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+<span class="nav-me"><b data-ns-account>游客</b><a href="profile.html" class="avatar-link" title="我的主页"><img class="avatar ph-1" alt="头像"></a></span>
 </header>
 
 <div class="back-row">
@@ -119,10 +152,20 @@
       <a class="panel-back" href="#" onclick="goPane('profile');return false">← 返回上一级</a>
       <h1>账号</h1>
       <p class="sub">账号安全相关的设置</p>
-      <div class="f-row"><label>账号 ID</label><input type="text" value="NS-2026-1119" disabled></div>
-      <div class="f-row"><label>当前密码</label><input type="password" placeholder="输入当前密码"></div>
-      <div class="f-row"><label>新密码</label><input type="password" placeholder="至少 8 位"></div>
-      <button class="btn btn-primary save" onclick="toast('密码已更新')">更新密码</button>
+      <div class="f-row"><label>账号 ID</label><input type="text" id="accId" value="" disabled></div>
+      <div class="f-row"><label>绑定邮箱</label><input type="text" id="accMail" value="" disabled></div>
+      <button class="btn btn-ghost" onclick="toast('这是本地演示账号，邮箱不支持修改')">修改邮箱</button>
+
+      <div class="f-row" style="margin-top:26px"><label>当前密码</label><input type="password" id="pwdOld" placeholder="输入当前密码"></div>
+      <div class="f-row"><label>新密码</label><input type="password" id="pwdNew" placeholder="至少 6 位"></div>
+      <div class="f-row"><label>确认新密码</label><input type="password" id="pwdNew2" placeholder="再输一次"></div>
+      <button class="btn btn-primary save" id="pwdBtn">更新密码</button>
+
+      <div class="danger-zone">
+        <h3>注销账号</h3>
+        <p>注销后账号和资料会被清掉，收藏、关注、评论也一起没，找不回来。</p>
+        <button class="btn btn-danger" id="delBtn">注销我的账号</button>
+      </div>
     </div>
 
     <!-- 通知 -->
@@ -212,6 +255,100 @@
     el.textContent = msg; el.style.opacity = 1;
     clearTimeout(tt); tt = setTimeout(()=>el.style.opacity = 0, 1700);
   }
+
+  /* ---------- 账号信息 + 改密码 ---------- */
+  (function(){
+    const u = (window.NSAuth && NSAuth.current()) || null;
+    const idEl = document.getElementById("accId");
+    const mailEl = document.getElementById("accMail");
+    if (u){
+      if (idEl) idEl.value = "NS-" + String(u.at || 0).slice(-8);
+      if (mailEl) mailEl.value = u.mail || "未绑定";
+    }
+    const oldI = document.getElementById("pwdOld"),
+          newI = document.getElementById("pwdNew"),
+          newI2 = document.getElementById("pwdNew2"),
+          btnP = document.getElementById("pwdBtn");
+    if (!btnP) return;
+    btnP.addEventListener("click", function(){
+      const cu = (window.NSAuth && NSAuth.current()) || null;
+      if (!cu) return toast("先登录一下");
+      if (!oldI.value) return toast("先输当前密码");
+      if (!NSAuth.checkPwd(cu.user, oldI.value)) return toast("当前密码不对");
+      if (newI.value.length < 6) return toast("新密码至少 6 位");
+      if (newI.value !== newI2.value) return toast("两次输的新密码不一样");
+      const r = NSAuth.resetPwd(cu.mail, newI.value);
+      if (!r.ok) return toast(r.msg);
+      oldI.value = newI.value = newI2.value = "";
+      toast("密码已更新");
+    });
+  })();
+
+  /* ---------- 注销账号 ---------- */
+  (function(){
+    const btn = document.getElementById("delBtn");
+    if (!btn) return;
+
+    const mask = document.createElement("div");
+    mask.className = "dlg-mask";
+    mask.style.display = "none";
+    mask.innerHTML =
+      '<div class="dlg" role="dialog" aria-modal="true">' +
+        '<h2>确定要注销吗</h2>' +
+        '<p>这个账号会被从本地删掉，收藏、关注、留言都一起没，没法恢复。</p>' +
+        '<input type="text" id="dlgWord" placeholder="输入「注销」两个字确认" autocomplete="off">' +
+        '<input type="password" id="dlgPwd" placeholder="再输一次密码" autocomplete="current-password">' +
+        '<p class="tip" id="dlgTip"></p>' +
+        '<div class="dlg-row">' +
+          '<button type="button" class="dlg-cancel" id="dlgNo">再想想</button>' +
+          '<button type="button" class="dlg-ok" id="dlgYes" disabled>确认注销</button>' +
+        '</div>' +
+      '</div>';
+    document.body.appendChild(mask);
+
+    const word = mask.querySelector("#dlgWord");
+    const pwd  = mask.querySelector("#dlgPwd");
+    const tip  = mask.querySelector("#dlgTip");
+    const yes  = mask.querySelector("#dlgYes");
+
+    const user = () => (window.NSAuth && NSAuth.current()) || null;
+
+    function check(){
+      yes.disabled = !(word.value.trim() === "注销" && pwd.value.length > 0);
+    }
+    word.addEventListener("input", check);
+    pwd.addEventListener("input", check);
+
+    function close(){
+      mask.classList.remove("on");
+      setTimeout(()=>{ if(!mask.classList.contains("on")) mask.style.display="none"; }, 220);
+      setTimeout(()=>{ word.value=""; pwd.value=""; tip.textContent=""; check(); }, 220);
+      document.removeEventListener("keydown", onKey);
+    }
+    function onKey(e){ if (e.key === "Escape") close(); }
+
+    btn.addEventListener("click", function(){
+      const u = user();
+      if (!u){ toast("还没登录呢"); location.href = "login.html"; return; }
+      mask.style.display = "flex";
+      requestAnimationFrame(()=>mask.classList.add("on"));
+      document.addEventListener("keydown", onKey);
+      setTimeout(()=>word.focus(), 120);
+    });
+
+    mask.querySelector("#dlgNo").addEventListener("click", close);
+    mask.addEventListener("click", e=>{ if (e.target === mask) close(); });
+
+    yes.addEventListener("click", function(){
+      const u = user();
+      if (!u) return close();
+      const r = NSAuth.remove(u.user, pwd.value);
+      if (!r.ok){ tip.textContent = r.msg; pwd.value = ""; check(); pwd.focus(); return; }
+      close();
+      toast("账号已注销");
+      setTimeout(()=>{ location.href = "login.html"; }, 800);
+    });
+  })();
 </script>
 <script src="js/notify.js"></script>
 <script src="js/notice.js"></script>

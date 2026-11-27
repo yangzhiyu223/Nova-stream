@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
 <link rel="stylesheet" href="css/night.css">
+<link rel="stylesheet" href="css/account.css">
 </head>
 <body>
 
@@ -22,10 +23,10 @@
     <a href="creators.html" data-page="creators.html">创作者</a>
     <a href="friends.html" data-page="friends.html">好友</a>
     <a href="upload.html">创作中心</a>
-    <a href="profile.html" data-page="profile.html">我的</a>
+    <a href="profile.html" data-page="profile.html" class="ns-need-login">我的</a>
   </nav>
   <button class="icon-btn" title="消息">🔔</button>
-  <a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+  <span class="nav-me"><b data-ns-account>游客</b><a href="profile.html" class="avatar-link" title="我的主页"><img class="avatar ph-1" alt="头像"></a></span>
 </header>
 
 <div class="shell">
@@ -39,8 +40,8 @@
     </nav>
     <p class="side-title" style="margin-top:26px">我的</p>
     <nav>
-      <a href="profile.html"><span class="dot"></span>个人主页</a>
-      <a href="settings.html"><span class="dot"></span>账号设置</a>
+      <a href="profile.html" class="ns-need-login"><span class="dot"></span>个人主页</a>
+      <a href="settings.html" class="ns-need-login"><span class="dot"></span>账号设置</a>
       <a href="login.html"><span class="dot"></span>登录注册</a>
     </nav>
     <div class="side-foot">
@@ -167,5 +168,6 @@
 <script src="js/hue.js"></script>
 <script src="js/notify.js"></script>
 <script src="js/notice.js"></script>
+<script src="js/account.js"></script>
 </body>
 </html>

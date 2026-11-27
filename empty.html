@@ -6,9 +6,10 @@
 <title>Nova Stream · 空状态</title>
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/night.css">
+<link rel="stylesheet" href="css/account.css">
 <style>
   .empty-wrap{max-width:1000px;margin:0 auto;padding:30px 26px 60px}
-  .panel{background:#fff;border-radius:28px;box-shadow:var(--sh-md);padding:60px 30px;text-align:center}
+  .panel{background:rgba(255,255,255,.05);border-radius:28px;box-shadow:var(--sh-md);padding:60px 30px;text-align:center}
   .illus{width:150px;height:150px;margin:0 auto 26px;position:relative}
   .illus .box{
     position:absolute;inset:0;border-radius:36px;
@@ -20,7 +21,7 @@
   @keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
   .panel h1{margin:0 0 10px;font-size:21px}
   .panel p{margin:0 0 26px;font-size:13.5px;color:var(--ink-3);line-height:1.9}
-  .tipbox{margin-top:34px;padding:18px 22px;border-radius:18px;background:#f8fafb;
+  .tipbox{margin-top:34px;padding:18px 22px;border-radius:18px;background:rgba(255,255,255,.045);
     font-size:12.5px;color:var(--ink-3);text-align:left;line-height:1.9}
 </style>
 <script src="js/hue.js"></script>
@@ -38,7 +39,7 @@
     <a href="creators.html">创作者</a>
     <a href="friends.html">好友</a>
     <a href="upload.html">创作中心</a>
-    <a href="profile.html">我的</a>
+    <a href="profile.html" class="ns-need-login">我的</a>
   </nav>
     <button class="icon-btn" title="消息">🔔</button>
 <a href="profile.html"><img class="avatar ph-2" alt="头像"></a>
@@ -60,5 +61,6 @@
 </div>
 <script src="js/notify.js"></script>
 <script src="js/notice.js"></script>
+<script src="js/account.js"></script>
 </body>
 </html>

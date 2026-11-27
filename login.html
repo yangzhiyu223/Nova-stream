@@ -4,179 +4,209 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Nova Stream · 登录</title>
-<link rel="stylesheet" href="css/style.css">
-<link rel="stylesheet" href="css/extra.css">
-<link rel="stylesheet" href="css/night.css">
-<script src="js/hue.js"></script>
+<link rel="stylesheet" href="css/auth.css">
 </head>
-<body>
-<div class="login-wrap">
-  <div class="login-card" id="card">
+<body class="auth-body">
+<main class="auth-shell">
+  <div class="auth-box" id="box">
 
     <!-- 登录 -->
-    <section class="pane show" data-pane="login">
-      <div class="logo" style="margin-bottom:22px"><span class="mark">N</span>Nova Stream</div>
+    <section class="view is-on" data-view="login">
+      <div class="brand"><i>N</i>Nova Stream</div>
       <h1>欢迎回来</h1>
-      <p class="lead">登录后继续你的观看</p>
-      <form onsubmit="doLogin(event)" novalidate>
-        <div class="field">
-          <input type="text" id="user" placeholder="用户名 / 邮箱">
-        </div>
-        <div class="field">
-          <input type="password" id="pwd" placeholder="密码">
-          <button type="button" class="eye" id="eye" onclick="toggleEye()">👁</button>
-        </div>
-        <button class="btn btn-primary" type="submit">登 录</button>
+      <p class="sub">登录后继续你的观看</p>
+      <form id="loginForm" autocomplete="on">
+        <label class="ipt">
+          <input type="text" id="user" placeholder="用户名 / 邮箱" autocomplete="username">
+        </label>
+        <label class="ipt ipt-pwd">
+          <input type="password" id="pwd" placeholder="密码" autocomplete="current-password">
+          <button type="button" class="eye" id="eye" aria-label="显示密码">👁</button>
+        </label>
+        <p class="msg" id="loginMsg"></p>
+        <button class="go" type="submit">登 录</button>
       </form>
-      <div class="login-foot">
-        <a href="#" onclick="goPane('forgot');return false">忘记密码？</a>
-        <a href="#" class="signup" onclick="goPane('signup');return false">注册账号</a>
+      <div class="bar">
+        <a href="#" data-goto="forgot">忘记密码？</a>
+        <a href="#" class="alt" data-goto="signup">注册账号</a>
       </div>
     </section>
 
     <!-- 注册 -->
-    <section class="pane" data-pane="signup">
-      <button class="pane-back" onclick="goPane('login')">← 返回登录</button>
+    <section class="view" data-view="signup">
+      <button type="button" class="back" data-goto="login">← 返回登录</button>
       <h1>创建账号</h1>
-      <p class="lead">注册后可以订阅创作者、收藏视频</p>
-      <form onsubmit="doSignup(event)" novalidate>
-        <div class="field">
-          <input type="text" id="sUser" placeholder="用户名（2-16 个字）">
-        </div>
-        <div class="field">
-          <input type="email" id="sMail" placeholder="邮箱">
-        </div>
-        <div class="field">
-          <input type="password" id="sPwd" placeholder="密码（至少 6 位）">
-        </div>
-        <div class="field">
-          <input type="password" id="sPwd2" placeholder="再输一次密码">
-        </div>
+      <p class="sub">注册后可以订阅创作者、收藏视频</p>
+      <form id="signupForm">
+        <label class="ipt"><input type="text" id="sUser" placeholder="用户名（2-16 个字）" autocomplete="off"></label>
+        <label class="ipt"><input type="text" id="sMail" placeholder="邮箱（演示用，随便填）" autocomplete="off"></label>
+        <p class="hint">这只是演示站，邮箱不校验格式，不用真地址，写个 1 也能过</p>
+        <label class="ipt"><input type="password" id="sPwd" placeholder="密码（至少 6 位）" autocomplete="new-password"></label>
+        <label class="ipt"><input type="password" id="sPwd2" placeholder="再输一次密码" autocomplete="new-password"></label>
         <label class="agree">
           <input type="checkbox" id="agree">
           <span>我已阅读并同意服务条款和隐私政策</span>
         </label>
-        <p class="hint" id="sHint"></p>
-        <button class="btn btn-primary" type="submit">注 册</button>
+        <p class="msg" id="signupMsg"></p>
+        <button class="go" type="submit">注 册</button>
       </form>
-      <div class="login-foot">
-        <a href="#" onclick="goPane('login');return false">已有账号，去登录</a>
+      <div class="bar">
+        <a href="#" data-goto="login">已有账号，去登录</a>
       </div>
     </section>
 
-    <!-- 忘记密码 -->
-    <section class="pane" data-pane="forgot">
-      <button class="pane-back" onclick="goPane('login')">← 返回登录</button>
+    <!-- 找回密码 -->
+    <section class="view" data-view="forgot">
+      <button type="button" class="back" data-goto="login">← 返回登录</button>
       <h1>找回密码</h1>
-      <p class="lead" id="fLead">输入注册邮箱，我们发一条重置链接给你</p>
-      <form onsubmit="doForgot(event)" novalidate>
-        <div class="field" id="fMailField">
-          <input type="email" id="fMail" placeholder="注册邮箱">
-        </div>
-        <div class="field" id="fCodeField" style="display:none">
-          <input type="text" id="fCode" placeholder="6 位验证码" maxlength="6">
-        </div>
-        <p class="hint" id="fHint"></p>
-        <button class="btn btn-primary" type="submit" id="fBtn">发送重置链接</button>
+      <p class="sub" id="fLead">输入注册邮箱，我们发一条重置链接给你</p>
+      <form id="forgotForm">
+        <label class="ipt" id="fMailWrap"><input type="email" id="fMail" placeholder="注册邮箱" autocomplete="email"></label>
+        <label class="ipt" id="fCodeWrap" hidden><input type="text" id="fCode" placeholder="6 位验证码" maxlength="6" inputmode="numeric"></label>
+        <label class="ipt" id="fPwdWrap" hidden><input type="password" id="fPwd" placeholder="新密码（至少 6 位）" autocomplete="new-password"></label>
+        <p class="msg" id="forgotMsg"></p>
+        <button class="go" type="submit" id="fBtn">发送重置链接</button>
       </form>
-      <div class="login-foot">
-        <a href="#" onclick="goPane('login');return false">想起来了，去登录</a>
+      <div class="bar">
+        <a href="#" data-goto="login">想起来了，去登录</a>
       </div>
     </section>
 
   </div>
-</div>
+</main>
 
 <script>
-  const card = document.getElementById("card");
-  function goPane(name){
-    card.querySelectorAll(".pane").forEach(p =>
-      p.classList.toggle("show", p.dataset.pane === name));
-    card.style.minHeight = "";
-    const first = card.querySelector(`.pane.show input`);
-    if (first) setTimeout(() => first.focus(), 60);
+(function(){
+  "use strict";
+
+  var box = document.getElementById("box");
+  var views = box.querySelectorAll(".view");
+
+  function go(name){
+    for (var i = 0; i < views.length; i++){
+      views[i].classList.toggle("is-on", views[i].dataset.view === name);
+    }
+    var on = box.querySelector(".view.is-on input");
+    if (on) setTimeout(function(){ on.focus(); }, 60);
   }
-  function hint(el, msg, ok){
-    el.textContent = msg || "";
+
+  box.addEventListener("click", function(e){
+    var t = e.target.closest("[data-goto]");
+    if (t){ e.preventDefault(); go(t.dataset.goto); }
+  });
+
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape") go("login");
+  });
+
+  function say(el, text, ok){
+    el.textContent = text || "";
     el.classList.toggle("ok", !!ok);
   }
-  function shake(el){
-    el.animate([
-      {transform:"translateX(0)"},{transform:"translateX(-8px)"},
-      {transform:"translateX(8px)"},{transform:"translateX(0)"}
-    ],{duration:260});
+  function wobble(el){
+    if (!el || !el.animate) return;
+    el.animate(
+      [{transform:"translateX(0)"},{transform:"translateX(-7px)"},
+       {transform:"translateX(7px)"},{transform:"translateX(0)"}],
+      {duration:240});
   }
-  function bad(el){ el.style.borderColor = "#f97316"; el.addEventListener("input",()=>el.style.borderColor="",{once:true}); }
+  function mark(el){
+    el.classList.add("err");
+    el.addEventListener("input", function(){ el.classList.remove("err"); }, {once:true});
+  }
+  /* 演示用：不卡邮箱格式，随便填个字就行 */
+  var MAIL = /^.{1,60}$/;   // 演示用：不要求 @，写什么都行
+
+  function backUrl(){
+    var n = new URLSearchParams(location.search).get("next");
+    if (!n) return "index.html";
+    return /^[\w.-]+\.html(\?.*)?$/.test(n) ? n : "index.html";
+  }
+  function leave(url, delay){
+    setTimeout(function(){ location.href = url; }, delay || 600);
+  }
+
+  /* 密码可见 */
+  var eye = document.getElementById("eye");
+  eye.addEventListener("click", function(){
+    var p = document.getElementById("pwd");
+    var show = p.type === "password";
+    p.type = show ? "text" : "password";
+    eye.classList.toggle("on", show);
+  });
 
   /* 登录 */
-  function toggleEye(){
-    const p = document.getElementById("pwd");
-    const on = p.type === "password";
-    p.type = on ? "text" : "password";
-    document.getElementById("eye").style.color = on ? "#f97316" : "";
-  }
-  function doLogin(e){
+  document.getElementById("loginForm").addEventListener("submit", function(e){
     e.preventDefault();
-    const u = document.getElementById("user"), p = document.getElementById("pwd");
-    if (!u.value.trim()) { shake(u); bad(u); return; }
-    if (!p.value.trim()) { shake(p); bad(p); return; }
-    sessionStorage.setItem("ns_user", u.value.trim());
-    location.href = "index.html";
-  }
+    var u = document.getElementById("user"), p = document.getElementById("pwd");
+    var m = document.getElementById("loginMsg");
+    if (!u.value.trim()){ wobble(u.parentNode); mark(u); say(m,"先填用户名或邮箱"); return; }
+    if (!p.value.trim()){ wobble(p.parentNode); mark(p); say(m,"密码还没填"); return; }
+    if (typeof NSAuth === "undefined"){ say(m,"登录服务没加载上，刷新一下"); return; }
+    var r = NSAuth.login(u.value, p.value);
+    if (!r.ok){ say(m, r.msg); wobble(p.parentNode); mark(p); return; }
+    say(m, "登录成功，带你回去…", true);
+    leave(backUrl(), 500);
+  });
 
   /* 注册 */
-  function doSignup(e){
+  document.getElementById("signupForm").addEventListener("submit", function(e){
     e.preventDefault();
-    const u = document.getElementById("sUser"), m = document.getElementById("sMail");
-    const p = document.getElementById("sPwd"), p2 = document.getElementById("sPwd2");
-    const a = document.getElementById("agree"), h = document.getElementById("sHint");
-    const uv = u.value.trim(), mv = m.value.trim();
-    if (uv.length < 2 || uv.length > 16) { hint(h,"用户名要 2-16 个字"); bad(u); return; }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mv)) { hint(h,"邮箱格式好像不对"); bad(m); return; }
-    if (p.value.length < 6) { hint(h,"密码至少 6 位"); bad(p); return; }
-    if (p.value !== p2.value) { hint(h,"两次密码不一致"); bad(p2); return; }
-    if (!a.checked) { hint(h,"先勾选一下同意条款"); shake(a.closest(".agree")); return; }
-    hint(h, "注册成功，正在带你登录…", true);
-    setTimeout(() => {
-      sessionStorage.setItem("ns_user", uv);
-      location.href = "index.html";
-    }, 700);
-  }
+    var u = document.getElementById("sUser"), ml = document.getElementById("sMail");
+    var p = document.getElementById("sPwd"), p2 = document.getElementById("sPwd2");
+    var ag = document.getElementById("agree"), m = document.getElementById("signupMsg");
+    var uv = u.value.trim(), mv = ml.value.trim();
+    if (uv.length < 2 || uv.length > 16){ say(m,"用户名要 2-16 个字"); mark(u); return; }
+    if (!mv){ say(m,"邮箱随便填一个就行"); mark(ml); return; }
+    if (p.value.length < 6){ say(m,"密码至少 6 位"); mark(p); return; }
+    if (p.value !== p2.value){ say(m,"两次密码不一致"); mark(p2); wobble(p2.parentNode); return; }
+    if (!ag.checked){ say(m,"先勾选一下同意条款"); wobble(ag.parentNode); return; }
+    if (typeof NSAuth === "undefined"){ say(m,"登录服务没加载上，刷新一下"); return; }
+    var r = NSAuth.signup(uv, mv, p.value);
+    if (!r.ok){ say(m, r.msg); mark(u); return; }
+    say(m, "注册成功，正在带你登录…", true);
+    leave(backUrl(), 700);
+  });
 
-  /* 忘记密码 */
-  let code = "";
-  let stage = 1;
-  function doForgot(e){
+  /* 找回密码 */
+  var stage = 1, code = "", mailNow = "";
+  document.getElementById("forgotForm").addEventListener("submit", function(e){
     e.preventDefault();
-    const m = document.getElementById("fMail"), c = document.getElementById("fCode");
-    const h = document.getElementById("fHint"), btn = document.getElementById("fBtn");
+    var ml = document.getElementById("fMail"), c = document.getElementById("fCode");
+    var np = document.getElementById("fPwd"), m = document.getElementById("forgotMsg");
+    var btn = document.getElementById("fBtn");
+    if (typeof NSAuth === "undefined"){ say(m,"登录服务没加载上，刷新一下"); return; }
+
     if (stage === 1){
-      const mv = m.value.trim();
-      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(mv)) { hint(h,"先填一个有效的邮箱"); bad(m); return; }
+      var mv = ml.value.trim();
+      if (!mv){ say(m,"先把邮箱填上"); mark(ml); return; }
+      if (!NSAuth.findByMail(mv)){ say(m,"这个邮箱还没注册过账号，先去注册？"); mark(ml); return; }
+      mailNow = mv;
       code = String(Math.floor(100000 + Math.random() * 900000));
-      document.getElementById("fCodeField").style.display = "";
-      document.getElementById("fCode").placeholder = "6 位验证码（演示：看这里）";
-      document.getElementById("fLead").textContent = `重置链接已发到 ${mv}`;
-      hint(h, `演示环境，验证码直接告诉你：${code}`, true);
+      document.getElementById("fCodeWrap").hidden = false;
+      document.getElementById("fPwdWrap").hidden = false;
+      document.getElementById("fLead").textContent = "重置链接已发到 " + mv;
+      say(m, "演示环境没有邮件服务，验证码直接告诉你：" + code, true);
       btn.textContent = "验证并重置";
       stage = 2;
-      c.focus();
+      setTimeout(function(){ c.focus(); }, 60);
       return;
     }
-    if (c.value.trim() !== code) { hint(h,"验证码不对，再看看"); bad(c); return; }
-    hint(h, "验证通过，去设置新密码了", true);
-    setTimeout(() => {
-      hint(h, "演示到这里就结束啦，密码已重置成你心里的那个 :)", true);
-    }, 600);
-  }
-
-  /* 回车切分栏、Esc 回登录 */
-  document.addEventListener("keydown", e => {
-    if (e.key === "Escape") goPane("login");
+    if (c.value.trim() !== code){ say(m,"验证码不对，再看看"); mark(c); return; }
+    if (np.value.length < 6){ say(m,"新密码至少 6 位"); mark(np); return; }
+    var r = NSAuth.resetPwd(mailNow, np.value);
+    if (!r.ok){ say(m, r.msg); return; }
+    NSAuth.loginAs(r.user);
+    say(m, "密码改好了，正在带你回去…", true);
+    leave(backUrl(), 800);
   });
-  const firstUser = document.getElementById("user");
-  if (firstUser) firstUser.focus();
+
+  setTimeout(function(){
+    var f = document.getElementById("user");
+    if (f) f.focus();
+  }, 80);
+})();
 </script>
-<script src="js/notice.js"></script>
+<script src="js/account.js"></script>
 </body>
 </html>

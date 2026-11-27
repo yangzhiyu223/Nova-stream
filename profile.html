@@ -7,25 +7,26 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
 <link rel="stylesheet" href="css/night.css">
+<link rel="stylesheet" href="css/account.css">
 <link rel="stylesheet" href="css/myworks.css">
 <style>
   .pc-wrap{max-width:1040px;margin:0 auto;padding:30px 26px 70px;display:grid;grid-template-columns:230px 1fr;gap:24px}
-  .pc-menu{background:#fff;border-radius:26px;padding:22px 14px;box-shadow:var(--sh-md);height:max-content}
+  .pc-menu{background:rgba(255,255,255,.05);border-radius:26px;padding:22px 14px;box-shadow:var(--sh-md);height:max-content}
   .pc-menu a{display:flex;align-items:center;gap:12px;padding:13px 16px;border-radius:14px;
     font-size:14px;color:var(--ink-2);transition:.2s;position:relative}
-  .pc-menu a:hover{background:#f6f8fa;color:var(--ink)}
-  .pc-menu a.on{color:var(--ink);font-weight:700;background:#f6f8fa}
+  .pc-menu a:hover{background:rgba(255,255,255,.07);color:var(--ink)}
+  .pc-menu a.on{color:var(--ink);font-weight:700;background:rgba(255,255,255,.07)}
   .pc-menu a.on::before{content:"";position:absolute;left:0;top:14px;bottom:14px;width:3px;
     border-radius:3px;background:var(--orange)}
-  .pc-panel{background:#fff;border-radius:26px;padding:32px 34px;box-shadow:var(--sh-md)}
+  .pc-panel{background:rgba(255,255,255,.05);border-radius:26px;padding:32px 34px;box-shadow:var(--sh-md)}
   .pc-panel h1{margin:0 0 26px;font-size:22px}
   .pf-hero{display:flex;align-items:center;gap:20px;margin-bottom:30px}
   .pf-hero .ava{width:92px;height:92px;border-radius:50%;border:4px solid #fff;box-shadow:var(--sh-md)}
   .pf-form .row{margin-bottom:18px}
   .pf-form label{display:block;font-size:13px;color:var(--ink-2);margin-bottom:8px;font-weight:600}
   .pf-form input,.pf-form textarea,.pf-form select{
-    width:100%;padding:0 18px;height:50px;border-radius:16px;border:1px solid #e8ebf0;
-    background:#fff;font-size:14px;color:var(--ink);transition:.2s;
+    width:100%;padding:0 18px;height:50px;border-radius:16px;border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.05);font-size:14px;color:var(--ink);transition:.2s;
   }
   .pf-form textarea{height:104px;padding:14px 18px;resize:vertical;line-height:1.7}
   .pf-form input:focus,.pf-form textarea:focus,.pf-form select:focus{
@@ -36,9 +37,9 @@
   .sw:last-child{border:none}
   .sw .k{font-size:14px}
   .sw .k small{display:block;color:var(--ink-3);font-size:12px;margin-top:4px}
-  .toggle{width:48px;height:28px;border-radius:99px;background:#e6eaf0;position:relative;transition:.24s;flex:0 0 auto}
+  .toggle{width:48px;height:28px;border-radius:99px;background:rgba(255,255,255,.14);position:relative;transition:.24s;flex:0 0 auto}
   .toggle::after{content:"";position:absolute;left:3px;top:3px;width:22px;height:22px;border-radius:50%;
-    background:#fff;box-shadow:0 2px 6px rgba(0,0,0,.14);transition:.24s}
+    background:rgba(255,255,255,.05);box-shadow:0 2px 6px rgba(0,0,0,.14);transition:.24s}
   .toggle.on{background:linear-gradient(100deg,#14b8a6,#2ec9ba)}
   .toggle.on::after{left:23px}
 </style>
@@ -57,10 +58,10 @@
     <a href="creators.html">创作者</a>
     <a href="friends.html">好友</a>
     <a href="upload.html">创作中心</a>
-    <a href="profile.html" class="active">我的</a>
+    <a href="profile.html" class="active ns-need-login">我的</a>
   </nav>
     <button class="icon-btn" title="消息">🔔</button>
-<a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+<span class="nav-me"><b data-ns-account>游客</b><a href="profile.html" class="avatar-link" title="我的主页"><img class="avatar ph-1" alt="头像"></a></span>
 </header>
 
 <div class="pc-wrap">
@@ -397,5 +398,6 @@ if (location.hash === "#works"){
   })();
 </script>
 <script src="js/notice.js"></script>
+<script src="js/account.js"></script>
 </body>
 </html>

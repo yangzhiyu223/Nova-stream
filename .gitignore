@@ -1,0 +1,18 @@
+# ä¸´æ—¶æ–‡ä»¶ï¼Œä¸è¿›ä»“åº“
+_prof*/
+_s[0-9]*.png
+_n*.png
+_*.png
+_w*.html
+_*.*
+t.png
+t2.png
+fix_*.png
+*.log
+.DS_Store
+Thumbs.db
+*.tmp
+
+# ×÷Òµµ¼Í¼Ö»Áô±¾µØ
+*µ¼Í¼*
+*¼ò°æ*

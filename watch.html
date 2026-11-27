@@ -7,6 +7,7 @@
 <link rel="stylesheet" href="css/style.css">
 <link rel="stylesheet" href="css/extra.css">
 <link rel="stylesheet" href="css/night.css">
+<link rel="stylesheet" href="css/account.css">
 <link rel="stylesheet" href="css/comments.css">
 <link rel="stylesheet" href="css/watchnav.css">
 <script src="js/hue.js"></script>
@@ -24,10 +25,10 @@
     <a href="creators.html">创作者</a>
     <a href="friends.html">好友</a>
     <a href="upload.html">创作中心</a>
-    <a href="profile.html">我的</a>
+    <a href="profile.html" class="ns-need-login">我的</a>
   </nav>
     <button class="icon-btn" title="消息">🔔</button>
-<a href="profile.html"><img class="avatar ph-1" alt="头像"></a>
+<span class="nav-me"><b data-ns-account>游客</b><a href="profile.html" class="avatar-link" title="我的主页"><img class="avatar ph-1" alt="头像"></a></span>
 </header>
 
 <div class="crumb-bar">
@@ -67,15 +68,15 @@
         <div>
           <h1>城市夜景延时 · 上海天际线</h1>
           <div class="row">
-            <span class="dur" style="background:#f2f6f9;color:#5b6472;padding:3px 10px;border-radius:8px">12.8 万次播放</span>
+            <span class="dur" style="background:transparent!important;color:rgba(255,255,255,.72);padding:0">12.8 万次播放</span>
             <span>2026-11-12</span>
             <span>· MV-1080P</span>
           </div>
         </div>
         <div class="vacts">
-          <button class="vact" onclick="like(this)">👍 <span>点赞</span></button>
-          <button class="vact teal" onclick="like(this)">🪙 <span>投币</span></button>
-          <button class="vact" onclick="like(this)">⭐ <span>收藏</span></button>
+          <button class="vact" onclick="like(this,'点赞')">👍 <span>点赞</span></button>
+          <button class="vact teal" onclick="like(this,'投币')">🪙 <span>投币</span></button>
+          <button class="vact" onclick="like(this,'收藏')">⭐ <span>收藏</span></button>
           <button class="vact" onclick="toast('分享链接已复制')">↗ 分享</button>
           <button class="vact" onclick="jumpCm()">💬 留言 <span id="vactCount">128</span></button>
         </div>
@@ -141,7 +142,7 @@
   /* ---- 推荐列表 ---- */
   document.getElementById("recList").innerHTML = RECOMMEND.map(v => `
     <a class="rec-item" href="watch.html?t=${encodeURIComponent(v.t)}&u=${encodeURIComponent(v.c)}">
-      <img class="thumb" src="assets/covers/v${((v.ph - 1) % 64) + 1}.jpg" alt="${v.t}" onerror="this.style.visibility='hidden'">
+      <img class="thumb" src="assets/covers/v${((v.ph - 1) % 64) + 1}.jpg" alt="${v.t}" onerror="this.outerHTML='&lt;div class=&quot;thumb-ph&quot;&gt;${(v.t||'视').trim().charAt(0)}&lt;/div&gt;'">
       <div>
         <h3>${v.t}</h3>
         <div class="sub">${v.c} · ${v.v}</div>
@@ -239,21 +240,33 @@
   volBtn.onclick = e => {
     e.stopPropagation();
     volWrap.classList.toggle("open");
+  };
+  volBtn.ondblclick = e => {
+    e.stopPropagation();
     if (vol === 0){ vol = lastVol || 0.7; }
     else { lastVol = vol; vol = 0; }
     paintVol();
   };
   function setVolByX(clientX){
     const r = volBar.getBoundingClientRect();
+    if (!r.width) return;
     vol = Math.min(1, Math.max(0, (clientX - r.left)/r.width));
     if (vol > 0) lastVol = vol;
     paintVol();
   }
   let vDragging = false;
   volBar.addEventListener("mousedown", e => { vDragging = true; setVolByX(e.clientX); e.stopPropagation(); });
+  volBar.addEventListener("click", e => { setVolByX(e.clientX); e.stopPropagation(); });
   window.addEventListener("mousemove", e => { if (vDragging) setVolByX(e.clientX); });
   window.addEventListener("mouseup", () => { vDragging = false; });
   volWrap.addEventListener("click", e => e.stopPropagation());
+  /* 滚轮微调音量 */
+  volWrap.addEventListener("wheel", e => {
+    e.preventDefault(); e.stopPropagation();
+    vol = Math.min(1, Math.max(0, +(vol - Math.sign(e.deltaY)*0.05).toFixed(2)));
+    if (vol > 0) lastVol = vol;
+    paintVol();
+  }, { passive:false });
   paintVol();
 
   /* ---- 弹幕 ---- */
@@ -265,6 +278,7 @@
     "截图当壁纸了","这里节奏刚刚好","安静得想睡觉",
     "城市真美","音乐搭得妙","求完整版","这条片我收藏了"
   ];
+  const DM_COLORS = ["#ffffff","#ffffff","#ffffff","#ffd166","#7ee0ff","#a8ff9e","#ffb0c8","#c9b6ff"];
   let dmOn = true, dmTimer = null, dmRow = 0;
 
   function fireDanmu(){
@@ -273,7 +287,8 @@
     el.className = "dm-item";
     el.textContent = DM_POOL[Math.floor(Math.random()*DM_POOL.length)];
     const rows = 6;
-    el.style.top = (10 + (dmRow % rows) * 13) + "%";
+    el.style.top = (8 + (dmRow % rows) * 13) + "%";
+    el.style.color = DM_COLORS[Math.floor(Math.random()*DM_COLORS.length)];
     dmRow++;
     el.style.animationDuration = (9 + Math.random()*3) + "s";
     dmLayer.appendChild(el);
@@ -332,7 +347,8 @@
     document.querySelector(".vinfo h1")?.textContent?.trim() || "视频播放";
 
   /* ---- 点赞/投币/收藏 ---- */
-  function like(btn){
+  function like(btn, why){
+    if (window.NSAuth && !NSAuth.requireLogin(why || "点赞")) return;
     const on = btn.classList.toggle("on");
     const label = btn.querySelector("span");
     if (!btn.dataset.raw) btn.dataset.raw = label.textContent;
@@ -410,11 +426,13 @@
   function loadMore(){ shown += 5; renderCm(); }
 
   function likeCm(id){
+    if (window.NSAuth && !NSAuth.requireLogin("点赞留言")) return;
     const c = CM.find(x=>x.id === id); if (!c) return;
     if (c.me) { c.like--; c.me = false; } else { c.like++; c.me = true; }
     renderCm();
   }
   function replyToCm(id, name){
+    if (window.NSAuth && !NSAuth.requireLogin("回复留言")) return;
     replyTo = { id, name };
     const inp = document.getElementById("cmIn");
     inp.value = "@" + name + " ";
@@ -430,6 +448,7 @@
     else if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); sendCm(); }
   }
   function sendCm(){
+    if (window.NSAuth && !NSAuth.requireLogin("留言")) return;
     const inp = document.getElementById("cmIn");
     const v = inp.value.trim();
     if (!v) { toast("说点什么再发吧"); inp.focus(); return; }
@@ -455,6 +474,7 @@
   }
 
   function jumpCm(){
+    if (window.NSAuth && !NSAuth.requireLogin("留言")) return;
     const p = document.getElementById("cmPanel");
     if (!p) return;
     const y = p.getBoundingClientRect().top + window.scrollY - 90;
@@ -506,5 +526,6 @@
 </script>
 <script src="js/notify.js"></script>
 <script src="js/notice.js"></script>
+<script src="js/account.js"></script>
 </body>
 </html>

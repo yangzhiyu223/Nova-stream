@@ -1,0 +1,214 @@
+/* ===================================================
+   登录 / 注册 / 找回密码   auth.css
+   只认 .auth-* / .view / .ipt / .go 这套类名
+   页面只引这一个样式表
+   =================================================== */
+
+*,*::before,*::after{box-sizing:border-box}
+
+html,body.auth-body{
+  margin:0;padding:0;width:100%;min-height:100%;
+}
+body.auth-body{
+  min-height:100vh;
+  font-family:"PingFang SC","Microsoft YaHei","Helvetica Neue",Arial,sans-serif;
+  color:#e9eef7;
+  background:
+    radial-gradient(760px 460px at 12% 8%, rgba(249,115,22,.16), transparent 62%),
+    radial-gradient(820px 500px at 88% 94%, rgba(79,216,200,.13), transparent 64%),
+    #0a0d16;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ---------- 外壳 ---------- */
+.auth-shell{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:40px 20px;
+}
+
+.auth-box{
+  width:100%;
+  max-width:420px;
+  border-radius:26px;
+  overflow:hidden;
+  background:#151d30;
+  border:1px solid rgba(255,255,255,.10);
+  box-shadow:0 30px 80px rgba(0,0,0,.55);
+  color:#e9eef7;
+}
+
+/* ---------- 分栏 ---------- */
+.view{display:none;padding:36px 36px 0}
+.view.is-on{display:block;animation:viewIn .24s ease-out}
+@keyframes viewIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}
+
+/* ---------- 标题 ---------- */
+.brand{
+  display:flex;align-items:center;gap:9px;
+  margin:0 0 22px;
+  font-size:16px;font-weight:700;letter-spacing:.3px;
+  color:#ffffff;
+}
+.brand i{
+  width:28px;height:28px;border-radius:9px;
+  display:flex;align-items:center;justify-content:center;
+  font-style:normal;font-size:15px;font-weight:800;
+  color:#08101e;
+  background:linear-gradient(135deg,#4fd8c8,#2fa8d8);
+}
+
+.view h1{
+  margin:0 0 6px;
+  font-size:26px;line-height:1.3;font-weight:800;
+  letter-spacing:.2px;
+  color:#ffffff;
+}
+.view .sub{
+  margin:0 0 22px;
+  font-size:13.5px;line-height:1.6;
+  color:#8d97a8;
+}
+
+/* ---------- 返回 ---------- */
+.back{
+  display:inline-block;
+  margin:0 0 16px;
+  padding:5px 12px;
+  border-radius:99px;
+  font-size:12.5px;font-family:inherit;
+  color:#c3cddd;
+  background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.10);
+  cursor:pointer;
+  transition:background .18s,color .18s;
+}
+.back:hover{background:rgba(249,115,22,.18);color:#ffb27a}
+
+/* ---------- 输入框 ---------- */
+.ipt{
+  position:relative;
+  display:block;
+  margin:0 0 12px;
+}
+.ipt input{
+  display:block;
+  width:100%;
+  height:50px;
+  margin:0;
+  padding:0 16px;
+  border-radius:14px;
+  font-size:14px;
+  font-family:inherit;
+  color:#eef2f9;
+  background:rgba(255,255,255,.055);
+  border:1px solid rgba(255,255,255,.13);
+  outline:none;
+  transition:border-color .18s,background .18s,box-shadow .18s;
+}
+.ipt input::placeholder{color:#8b96a9}
+.ipt input:hover{background:rgba(255,255,255,.075)}
+.ipt input:focus{
+  background:rgba(255,255,255,.085);
+  border-color:#f97316;
+  box-shadow:0 0 0 3px rgba(249,115,22,.16);
+}
+.ipt.err input{border-color:#f97316;background:rgba(249,115,22,.08)}
+
+/* 密码框右侧留位 */
+.ipt-pwd input{padding-right:52px}
+.eye{
+  position:absolute;
+  right:6px;top:6px;
+  width:38px;height:38px;
+  padding:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;line-height:1;
+  color:#9aa6b8;
+  background:transparent;
+  border:0;border-radius:11px;
+  cursor:pointer;
+  transition:background .18s,color .18s;
+}
+.eye:hover{background:rgba(255,255,255,.09);color:#e9eef7}
+.eye.on{color:#f97316}
+
+/* 自动填充保持深色 */
+.ipt input:-webkit-autofill,
+.ipt input:-webkit-autofill:hover,
+.ipt input:-webkit-autofill:focus{
+  -webkit-text-fill-color:#eef2f9;
+  -webkit-box-shadow:0 0 0 1000px #1c2740 inset;
+  box-shadow:0 0 0 1000px #1c2740 inset;
+  caret-color:#eef2f9;
+  transition:background-color 9999s ease-in-out 0s;
+}
+
+/* ---------- 同意条款 ---------- */
+.agree{
+  display:flex;align-items:flex-start;gap:8px;
+  margin:6px 0 10px;
+  font-size:12.5px;line-height:1.5;
+  color:#9aa6b8;
+  cursor:pointer;
+}
+.agree input{
+  width:15px;height:15px;
+  margin:2px 0 0;flex:none;
+  accent-color:#f97316;
+  cursor:pointer;
+}
+.agree span{color:#9aa6b8}
+
+/* ---------- 提示语 ---------- */
+.msg{
+  min-height:18px;
+  margin:0 0 10px;
+  font-size:12.5px;line-height:1.4;
+  color:#ff8a7a;
+}
+.msg.ok{color:#4fd8c8}
+
+/* ---------- 主按钮 ---------- */
+.go{
+  display:block;
+  width:100%;height:52px;
+  padding:0;
+  border:0;border-radius:16px;
+  font-size:15.5px;font-weight:700;font-family:inherit;
+  letter-spacing:2px;
+  color:#12202f;
+  background:linear-gradient(135deg,#ffb066,#f97316);
+  box-shadow:0 12px 26px rgba(249,115,22,.26);
+  cursor:pointer;
+  transition:transform .15s,box-shadow .18s,filter .18s;
+}
+.go:hover{filter:brightness(1.06);box-shadow:0 14px 30px rgba(249,115,22,.34)}
+.go:active{transform:translateY(1px)}
+
+/* ---------- 底部条 ---------- */
+.bar{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:22px -36px 0;
+  padding:17px 36px 24px;
+  font-size:13px;
+  background:rgba(8,12,22,.45);
+  border-top:1px solid rgba(255,255,255,.07);
+}
+.bar a{color:#c9a37c;text-decoration:none;transition:color .18s}
+.bar a:hover{color:#ffb27a}
+.bar a.alt{color:#4fd8c8;font-weight:700}
+.bar a.alt:hover{color:#7ef0e2}
+
+/* ---------- 窄屏 ---------- */
+@media (max-width:520px){
+  .auth-shell{padding:24px 14px}
+  .auth-box{border-radius:22px}
+  .view{padding:28px 22px 0}
+  .view h1{font-size:23px}
+  .bar{margin:20px -22px 0;padding:15px 22px 20px}
+  .ipt input{height:48px}
+  .go{height:50px}
+}

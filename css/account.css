@@ -1,0 +1,73 @@
+/* ================= Nova Stream · 账号 / 游客 / 登录拦截 ================= */
+
+/* 顶栏「我的」：昵称 + 头像 */
+.nav-me{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:5px 6px 5px 12px;border-radius:999px;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.10);
+  transition:background .18s ease,border-color .18s ease;
+}
+.nav-me:hover{background:rgba(255,255,255,.08);border-color:rgba(255,255,255,.18)}
+.nav-me b{
+  font-size:12.5px;font-weight:600;max-width:86px;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  color:rgba(255,255,255,.86);
+}
+.nav-me b.ns-guest{color:rgba(255,255,255,.45)}
+.avatar-link{display:inline-flex;line-height:0}
+
+/* 登录/注册输入框提示语气 */
+.hint.ok{color:#7fe0b0!important}
+
+/* 游客拦截弹窗 */
+.lg-gate-mask{
+  position:fixed;inset:0;z-index:9998;
+  display:flex;align-items:center;justify-content:center;padding:20px;
+  background:rgba(6,9,16,.66);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  animation:lgFade .2s ease-out;
+}
+.lg-gate{
+  width:100%;max-width:420px;padding:32px 30px 26px;border-radius:24px;
+  background:linear-gradient(160deg,rgba(30,37,58,.98),rgba(18,23,38,.98));
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 34px 90px rgba(0,0,0,.72);
+  text-align:center;
+  animation:lgRise .26s cubic-bezier(.2,.8,.3,1);
+}
+.lg-gate-badge{
+  display:inline-block;margin-bottom:14px;padding:5px 14px;border-radius:999px;
+  font-size:12px;letter-spacing:.12em;color:#ffb057;
+  background:rgba(255,138,61,.14);border:1px solid rgba(255,138,61,.28);
+}
+.lg-gate h2{font-size:20px;color:#fff;margin:0 0 14px;font-weight:700}
+.lg-gate p{
+  font-size:13.5px;line-height:1.8;margin:0 0 8px;text-align:left;
+  color:rgba(255,255,255,.62);
+}
+.lg-gate-sub{color:rgba(255,255,255,.40)!important;font-size:12.5px}
+.lg-gate-acts{display:flex;gap:10px;margin-top:20px}
+.lg-gate-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;
+  padding:12px 0;border:0;border-radius:14px;cursor:pointer;
+  font-size:14px;font-weight:700;font-family:inherit;text-decoration:none;
+  background:rgba(255,255,255,.07);color:rgba(255,255,255,.80);
+  border:1px solid rgba(255,255,255,.12);
+  transition:background .16s ease,transform .16s ease;
+}
+.lg-gate-btn:hover{background:rgba(255,255,255,.12);transform:translateY(-1px)}
+.lg-gate-btn.primary{
+  border:1px solid transparent;
+  background:linear-gradient(100deg,#ff8a3d,#ffb057);
+  color:#241304;
+  box-shadow:0 12px 28px rgba(255,138,61,.32);
+}
+.lg-gate-btn.primary:hover{box-shadow:0 14px 32px rgba(255,138,61,.44)}
+@keyframes lgFade{from{opacity:0}to{opacity:1}}
+@keyframes lgRise{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+@media (max-width:480px){
+  .lg-gate{padding:26px 20px 20px}
+  .lg-gate h2{font-size:18px}
+  .nav-me b{max-width:56px}
+}
